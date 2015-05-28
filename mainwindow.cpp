@@ -1,10 +1,14 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "controlpreprocesamiento.h"
+#include "controlsegmentacion.h"
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    this->ImagenAbierta = false;
     ui->setupUi(this);
 }
 
@@ -13,52 +17,90 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_calcularUmbralBT_clicked()
-{
-    int umbral = ui->umbralSP->value();
-    cout<<umbral<<endl;
-
-
-    Mat umbralImage;
-
-    threshold(srcImage,umbralImage,umbral,255,CV_THRESH_BINARY);
-
-    imshow("UMBRAL",umbralImage);
-    imshow("ORIGINAL",srcImage);
-
-
-}
 
 //When Clic on Abrir Imagen
 void MainWindow::on_abrirImagenBT_clicked()
 {
+    if(ImagenAbierta)
+    {
+        QMessageBox msgBox;
+        msgBox.setText("Una Imagen esta siendo procesada en este momento.");
+        msgBox.setInformativeText("¿Desea abrir una nueva imagen?");
+        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Discard);
+        int ret = msgBox.exec();
+
+        switch (ret) {
+        case QMessageBox::Yes:
+            resetWidgets();
+            buscarArchivo();
+            break;
+        case QMessageBox::Discard:
+
+            break;
+        default:
+            // should never be reached
+            break;
+        }
+    }
+    else
+    {
+        buscarArchivo();
+    }
+}
+
+void MainWindow::buscarArchivo()
+{
+
     this->imageFile = QFileDialog::getOpenFileName(this,tr("Open Image"),"./resources",tr("Image Files(*.png *.jpg *.bmp)"));
 
     this->ui->filePathLE->setText(imageFile);
     QPixmap imagePixel(imageFile);
-    ui->imageLabelLB->setPixmap(imagePixel);
+    ui->ImagenOriginalLB->setPixmap(imagePixel);
 
     ui->calcularUmbralBT->setEnabled(true);
-    ui->umbralSP->setEnabled(true);
 
     this->srcImage = imread(imageFile.toStdString().data(),0);
+    this->ImagenAbierta = true;
+}
+
+void MainWindow::on_calcularUmbralBT_clicked()
+{
+    this->dstImageTreshold = ControlPreprocesamiento::umbralAutomatico(srcImage);
+
+    /*imshow("UMBRAL",dstImageTreshold);
+    imshow("ORIGINAL",srcImage);*/
+
+    QImage umbralImage = Mat2QImage(dstImageTreshold);
+    ui->UmbralizacionLB->setPixmap(QPixmap::fromImage(umbralImage));
+
+    ui->AperturaBT->setEnabled(true);
 
 }
 
-void MainWindow::on_aperturaBT_clicked()
+
+void MainWindow::on_AperturaBT_clicked()
 {
-    int size = 3;
-    Mat BStructElement = getStructuringElement(CV_SHAPE_RECT,Size(3,3));
-    Mat dstOpening;
+    Mat BStructElement = getStructuringElement(CV_SHAPE_RECT,Size(2,2));
+    //erode(dstImageTreshold,dstImageOpening,Mat(),cv::Point(-1,-1),2);
+    morphologyEx(this->dstImageTreshold, this->dstImageClose, CV_MOP_DILATE, BStructElement,Point(-1,-1) ,2 );
+    //morphologyEx(this->dstImageClose, this->dstImageOpening, CV_MOP_OPEN, BStructElement );
 
-    erode(srcImage,dstOpening,BStructElement);
+   // imshow("APERTURA",this->dstImageOpening);
+    QImage filtradoImage = Mat2QImage(dstImageClose);
+    ui->FiltradoMorfologicoLB->setPixmap(QPixmap::fromImage(filtradoImage));
 
-    imshow("DILATE",dstOpening);
+    ui->AdelgazamientoBT->setEnabled(true);
+    ui->SegmentacionBT->setEnabled(true);
+
 }
 
 void MainWindow::on_cierreBT_clicked()
 {
+    Mat BStructElement = getStructuringElement(CV_SHAPE_RECT,Size(3,3));
 
+    morphologyEx(this->dstImageOpening, this->dstImageClose, CV_MOP_CLOSE, BStructElement );
+
+    imshow("CIERRE",this->dstImageClose);
 }
 
 
@@ -68,11 +110,13 @@ void MainWindow::on_GO_clicked()
 
 
 
-    String path = "/home/snipercat/Desktop/ETL8/images/GO/GO.ITSUT_000.png";
+    //String path = "/home/snipercat/Desktop/ETL8/images/GO/GO.ITSUT_000.png";
     //const char* image = ;
+
+    /* //Lo Modifique para que use la srcImage que carga desde el boton de Load
     Mat imagenBW = imread( path , CV_LOAD_IMAGE_GRAYSCALE );// cargamos la imagen en Blanco y negros
 
-    /* //Cambiar el Tamaño de la imagen en caso de que sea muy grande
+    Cambiar el Tamaño de la imagen en caso de que sea muy grande
      * int maxheight = ui->maxHeight->value();
     if(maxheight !=0 && imagenBW->height > maxheight){
         IplImage *resizedImage = cvCreateImage( cvSize( maxheight * (imagenBW->width/(imagenBW->height)) , maxheight) , imagenBW->depth , imagenBW->nChannels);
@@ -81,66 +125,91 @@ void MainWindow::on_GO_clicked()
     }
     */
 
-    imshow("ORIGINAL",imagenBW);
+    imshow("ORIGINAL",this->srcImage);
 
 //Threshold
-    Mat thresholdImage = umbralAutomatico(imagenBW);
-    imshow( "Binarizada", thresholdImage ); // representamos la imagen en la ventana
+    this->dstImageTreshold = ControlPreprocesamiento::umbralAutomatico(this->srcImage);
+    imshow( "Binarizada", this->dstImageTreshold ); // representamos la imagen en la ventana
 
 //Morphologia
-    Mat morphedImage =  morphImage(thresholdImage);
-    imshow( "Morphed", morphedImage ); // representamos la imagen en la ventana
+    this->dstImageClose =  ControlPreprocesamiento::morphImage(this->dstImageTreshold);
+    imshow( "Morphed", this->dstImageClose ); // representamos la imagen en la ventana
 
 //Esqueletización
-    Mat skeletonImage = skeleton(morphedImage);
-    imshow( "skeleton", skeletonImage ); // representamos la imagen en la ventana
+//    this->dstImageSkeleton = ControlPreprocesamiento::skeleton(this->dstImageClose);
+//    imshow( "skeleton", this->dstImageSkeleton ); // representamos la imagen en la ventana
 
 
 }
 
 
-/***************** FUNCIONES PARA EL PROCESAMIENTO DE IMAGENES ******************************/
-Mat  MainWindow::umbralAutomatico( Mat sourceImage){
-    Mat umbralImage;
-    adaptiveThreshold(sourceImage, umbralImage, 255, CV_ADAPTIVE_THRESH_MEAN_C, CV_THRESH_BINARY,3,5);
-    //threshold(sourceImage , umbralImage, 170 ,255,CV_THRESH_BINARY);
-    return umbralImage;
+
+void MainWindow::on_AdelgazamientoBT_clicked()
+{
+    dstImageAdelgazada = Mat::zeros(dstImageClose.size(), CV_8UC1);
+    dstImageClose.copyTo(dstImageAdelgazada);
+
+    ControlPreprocesamiento::adelgazamiento(dstImageAdelgazada);
+
+    dstImageAdelgazada.copyTo(dstImageRectanguloEnvolvente);
+    //Se suman 3 pixeles de distancia a las medidas del rectangulo para darle espacio
+    //alalgoritmo de busqueda de end-points
+    dstRectanguloEnvolvente.height += 3;
+    dstRectanguloEnvolvente.width += 3;
+
+    rectangle(dstImageRectanguloEnvolvente,dstRectanguloEnvolvente,Scalar(255));
+
+    //Convertir imagenes y transformarlas para mostrar en la UI
+    QImage RectanguloEnvolventeImage = Mat2QImage(dstImageRectanguloEnvolvente);
+    ui->RectanguloEnvolventeLB->setPixmap(QPixmap::fromImage(RectanguloEnvolventeImage));
+
+    QImage adelgazamientoImage = Mat2QImage(dstImageAdelgazada);
+    ui->AdelgazamientoLB->setPixmap(QPixmap::fromImage(adelgazamientoImage));
+
+    //Habilitar el boton de Caracteristicas
+    ui->CaracteristicasBT->setEnabled(true);
+
 }
 
-Mat  MainWindow::morphImage( Mat sourceImage){
+void MainWindow::on_SegmentacionBT_clicked()
+{
+    Mat src = imread(this->imageFile.toStdString());
+    ControlSegmentacion::encontrarSegmentos(src,dstImageClose,dstImageSegmentacion,dstRectanguloEnvolvente);
 
-    Mat morphedImage;// = morphImage( thresholdImage );
-    Mat BStructElement = getStructuringElement(CV_SHAPE_RECT,Size(3,3));
-
-    morphologyEx( sourceImage, morphedImage, CV_MOP_ERODE, BStructElement );
-    threshold(morphedImage, morphedImage, 100,255, CV_THRESH_BINARY_INV);
-
-    return morphedImage;
+    QImage segmentacionImage = Mat2QImage(this->dstImageSegmentacion);
+    ui->SegmentacionLB->setPixmap(QPixmap::fromImage(segmentacionImage));
 }
 
-Mat  MainWindow::skeleton( Mat sourceImage){
-    Mat img( sourceImage);
 
-    cv::Mat skel(img.size(), CV_8UC1, cv::Scalar(0));
-    cv::Mat temp(img.size(), CV_8UC1);
+QImage MainWindow::Mat2QImage(const Mat& srcImage)
+{
+    Mat tempImage;
+    switch (srcImage.type()) {//Se convierte el archivo Mat a RGB para poderlo mostrar en pantalla
+         case CV_8UC1:
+             cvtColor(srcImage,tempImage, CV_GRAY2RGB);
+             break;
+         case CV_8UC3:
+             cvtColor(srcImage, tempImage, CV_BGR2RGB);
+             break;
+         }
 
-    cv::Mat element = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
-
-    bool done;
-    do
-    {
-      cv::morphologyEx(img, temp, cv::MORPH_OPEN, element);
-      cv::bitwise_not(temp, temp);
-      cv::bitwise_and(img, temp, temp);
-      cv::bitwise_or(skel, temp, skel);
-      cv::erode(img, img, element);
-
-      double max;
-      cv::minMaxLoc(img, 0, &max);
-      done = (max == 0);
-    } while (!done);
+    return QImage((uchar*)tempImage.data, tempImage.cols, tempImage.rows,tempImage.cols*3
+                      ,QImage::Format_RGB888).copy();
+}
 
 
-    return skel;
+void MainWindow::resetWidgets()
+{
+    ui->calcularUmbralBT->setEnabled(false);
+    ui->AdelgazamientoBT->setEnabled(false);
+    ui->AperturaBT->setEnabled(false);
+    ui->SegmentacionBT->setEnabled(false);
+
+    ui->ImagenOriginalLB->clear();
+    ui->AdelgazamientoLB->clear();
+    ui->FiltradoMorfologicoLB->clear();
+    ui->RectanguloEnvolventeLB->clear();
+    ui->SegmentacionLB->clear();
+    ui->UmbralizacionLB->clear();
 
 }

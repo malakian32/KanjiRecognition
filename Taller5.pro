@@ -14,12 +14,17 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    controlpreprocesamiento.cpp
+    controlpreprocesamiento.cpp \
+    controlsegmentacion.cpp \
+    dialogocaracteristicas.cpp
 
 HEADERS  += mainwindow.h \
-    controlpreprocesamiento.h
+    controlpreprocesamiento.h \
+    controlsegmentacion.h \
+    dialogocaracteristicas.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    dialogocaracteristicas.ui
 
 
 INCLUDEPATH += /usr/local/include/opencv
@@ -28,4 +33,8 @@ INCLUDEPATH += /usr/local/include/opencv2
 LIBS += `pkg-config opencv --libs`
 
 DISTFILES += \
-    ../../../Downloads/search102.png
+    ../../../Downloads/search102.png \
+    ../../../../Downloads/1432827147_package_graphics.png
+
+RESOURCES += \
+    resources.qrc

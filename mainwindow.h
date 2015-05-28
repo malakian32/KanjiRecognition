@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QFileDialog>
 #include <QPixmap>
+#include <QMessageBox>
 
 #include <iostream>
 #include <stdio.h>
@@ -25,26 +26,40 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+    QImage Mat2QImage(const Mat& srcImage);
 
 private slots:
     void on_calcularUmbralBT_clicked();
 
     void on_abrirImagenBT_clicked();
 
-    void on_aperturaBT_clicked();
-
     void on_cierreBT_clicked();
 
     void on_GO_clicked();
 
-    //FUNCIONES PARA PROCESAMIENTO
-    Mat  umbralAutomatico( Mat sourceImage);
-    Mat  morphImage( Mat sourceImage);
-    Mat  skeleton( Mat sourceImage);
+    void on_AdelgazamientoBT_clicked();
 
+    void on_SegmentacionBT_clicked();
+
+    void on_AperturaBT_clicked();
+
+    void resetWidgets();
+
+    void buscarArchivo();
 private:
     Mat srcImage;
+    Mat dstImageTreshold;
+    Mat dstImageOpening;
+    Mat dstImageClose;
+    Mat dstImageAdelgazada;
+    Mat dstImageSegmentacion;
+    Mat dstImageRectanguloEnvolvente;
+
+    Rect dstRectanguloEnvolvente;
+
     QString imageFile;
+
+    bool ImagenAbierta;
     Ui::MainWindow *ui;
 };
 
