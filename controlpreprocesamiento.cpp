@@ -65,8 +65,15 @@ void ControlPreprocesamiento::adelgazamiento(Mat& srcImage)
 /***************** FUNCIONES PARA EL PROCESAMIENTO DE IMAGENES ******************************/
 Mat  ControlPreprocesamiento::umbralAutomatico( Mat sourceImage){
     Mat umbralImage;
+
+    threshold(sourceImage , umbralImage, 170 ,255,CV_THRESH_BINARY);
+    return umbralImage;
+}
+
+Mat ControlPreprocesamiento::umbralAutomaticoAdaptativo(Mat sourceImage)
+{
+    Mat umbralImage;
     adaptiveThreshold(sourceImage, umbralImage, 255, CV_ADAPTIVE_THRESH_MEAN_C, CV_THRESH_BINARY_INV,3,5);
-    //threshold(sourceImage , umbralImage, 0 ,255,CV_THRESH_BINARY_INV);
     return umbralImage;
 }
 
@@ -79,4 +86,85 @@ Mat  ControlPreprocesamiento::morphImage( Mat sourceImage){
     threshold(morphedImage, morphedImage, 100,255, CV_THRESH_BINARY_INV);
 
     return morphedImage;
+
+
+
+
+}
+
+
+
+
+vector<vector<Point> > ControlPreprocesamiento::getContornos( Mat src_gray){
+    Mat canny_output;
+    vector<vector<Point> > contours;
+    vector<Vec4i> hierarchy;
+    int thresh = 100;
+
+    /// Detect edges using canny
+    Canny( src_gray, canny_output, thresh, thresh*2, 3 );
+    /// Find contours
+    findContours( canny_output, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
+
+   /*
+    /// Draw contours
+    Mat drawing = Mat::zeros( canny_output.size(), CV_8UC3 );
+    RNG rng(12345);
+    for( int i = 0; i< contours.size(); i++ )
+       {
+         Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
+         drawContours( drawing, contours, i, color, 1, 8, hierarchy, 0, Point() );
+         //circle( drawing, mc[i], 4, color, -1, 8, 0 );
+       }
+
+    /// Show in a window
+    namedWindow( "Contours", CV_WINDOW_AUTOSIZE );
+    imshow( "Contours", drawing );
+*/
+    return contours;
+}
+
+/**
+ * @brief ControlPreprocesamiento::getContornosImage Retorna una imagen con los contornos dibujados.
+ * @param src_gray Imagen de referencia para obtener el tamaño de la imágen de salida
+ * @param contours Vector con los contornos.
+ * @return
+ */
+Mat ControlPreprocesamiento::getContornosImage(Mat src_gray, vector<vector<Point> > contours){
+    Mat drawing = Mat::zeros( src_gray.size(), CV_8UC3 );
+    RNG rng(12345);
+    for( int i = 0; i< contours.size(); i++ )
+       {
+         Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
+         //drawContours( drawing, contours, i, color, 1, 8, hierarchy, 0, Point() );
+         drawContours( drawing, contours, i, color, 1, 8, noArray(), 0, Point() );
+         //circle( drawing, mc[i], 4, color, -1, 8, 0 );
+       }
+    return drawing;
+}
+
+
+vector<vector<double> > ControlPreprocesamiento::getHuMoments( vector<vector<Point> >  contours){
+
+    vector<vector<double> > HuMoments;
+    HuMoments.resize(contours.size());
+
+    for( int i = 0; i< contours.size(); i++ )
+       {
+        // From the example you posted, you already know how to compute the contours
+        // so let's take just the first one and compute the moments
+        cv::Moments mom = cv::moments(contours[i]);
+        double hu[7];
+        cv::HuMoments(mom, hu); // now in hu are your 7 Hu-Moments
+
+        //resize Vector and copy hu Moments Values to the vector
+        cout<<"Contourn "<<i<<"\n";
+        HuMoments[i].resize(7);
+        for(int c = 0; c < 7; c++ ){
+            HuMoments[i][c] = hu[c];
+            cout<<"\tHu["<<c<<"]="<<hu[c]<<"\n";
+        }
+       }
+
+    return HuMoments;
 }

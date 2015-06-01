@@ -47,6 +47,7 @@ private slots:
     void buscarArchivo();
     void on_CaracteristicasBT_clicked();
 
+
     void on_abrirFicheroBT_clicked();
 
 private:
@@ -57,6 +58,7 @@ private:
     Mat dstImageAdelgazada;
     Mat dstImageSegmentacion;
     Mat dstImageRectanguloEnvolvente;
+    Mat dstImageContornos;
 
     Rect dstRectanguloEnvolvente;
 
