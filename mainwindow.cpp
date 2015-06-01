@@ -1,7 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "controlpreprocesamiento.h"
-#include "controlsegmentacion.h"
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -89,7 +87,6 @@ void MainWindow::on_AperturaBT_clicked()
     QImage filtradoImage = Mat2QImage(dstImageClose);
     ui->FiltradoMorfologicoLB->setPixmap(QPixmap::fromImage(filtradoImage));
 
-    ui->AdelgazamientoBT->setEnabled(true);
     ui->SegmentacionBT->setEnabled(true);
 
 }
@@ -154,8 +151,10 @@ void MainWindow::on_AdelgazamientoBT_clicked()
     dstImageAdelgazada.copyTo(dstImageRectanguloEnvolvente);
     //Se suman 3 pixeles de distancia a las medidas del rectangulo para darle espacio
     //alalgoritmo de busqueda de end-points
-    dstRectanguloEnvolvente.height += 3;
-    dstRectanguloEnvolvente.width += 3;
+    dstRectanguloEnvolvente.height += 6;
+    dstRectanguloEnvolvente.width += 6;
+    dstRectanguloEnvolvente.x -= 3;
+    dstRectanguloEnvolvente.y -= 3;
 
     rectangle(dstImageRectanguloEnvolvente,dstRectanguloEnvolvente,Scalar(255));
 
@@ -178,6 +177,9 @@ void MainWindow::on_SegmentacionBT_clicked()
 
     QImage segmentacionImage = Mat2QImage(this->dstImageSegmentacion);
     ui->SegmentacionLB->setPixmap(QPixmap::fromImage(segmentacionImage));
+
+    ui->AdelgazamientoBT->setEnabled(true);
+
 }
 
 
@@ -198,6 +200,14 @@ QImage MainWindow::Mat2QImage(const Mat& srcImage)
 }
 
 
+
+void MainWindow::on_CaracteristicasBT_clicked()
+{
+    DialogoCaracteristicas* dialogoCaracteristicas = new DialogoCaracteristicas(this,this,srcImage,dstImageAdelgazada,dstRectanguloEnvolvente);
+
+    dialogoCaracteristicas->show();
+}
+
 void MainWindow::resetWidgets()
 {
     ui->calcularUmbralBT->setEnabled(false);
@@ -211,5 +221,18 @@ void MainWindow::resetWidgets()
     ui->RectanguloEnvolventeLB->clear();
     ui->SegmentacionLB->clear();
     ui->UmbralizacionLB->clear();
+
+}
+
+
+//Boton para abrir un fichero completo
+void MainWindow::on_abrirFicheroBT_clicked()
+
+{
+    this->ficheroAbierto = QFileDialog::getExistingDirectory(this,tr("Abrir Directorio"),"./resources",QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+
+    ControlFicheros::abrirFichero(path(ficheroAbierto.toStdString()),imagesDirectory);
+
+    ui->URLFicherLB->setText(ficheroAbierto);
 
 }

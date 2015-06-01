@@ -16,12 +16,16 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     controlpreprocesamiento.cpp \
     controlsegmentacion.cpp \
-    dialogocaracteristicas.cpp
+    dialogocaracteristicas.cpp \
+    controlobtencioncaracteristicas.cpp \
+    controlficheros.cpp
 
 HEADERS  += mainwindow.h \
     controlpreprocesamiento.h \
     controlsegmentacion.h \
-    dialogocaracteristicas.h
+    dialogocaracteristicas.h \
+    controlobtencioncaracteristicas.h \
+    controlficheros.h
 
 FORMS    += mainwindow.ui \
     dialogocaracteristicas.ui
@@ -29,8 +33,10 @@ FORMS    += mainwindow.ui \
 
 INCLUDEPATH += /usr/local/include/opencv
 INCLUDEPATH += /usr/local/include/opencv2
+INCLUDEPATH += /home/nicolas/Boost
 
 LIBS += `pkg-config opencv --libs`
+LIBS += -L/usr/lib/ -lboost_filesystem -lboost_system
 
 DISTFILES += \
     ../../../Downloads/search102.png \

@@ -2,6 +2,17 @@
 #define DIALOGOCARACTERISTICAS_H
 
 #include <QDialog>
+#include <QMainWindow>
+
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+
+#include "mainwindow.h"
+#include "controlobtencioncaracteristicas.h"
+#include <iostream>
+using namespace cv;
+using namespace std;
+
 
 namespace Ui {
 class DialogoCaracteristicas;
@@ -12,11 +23,25 @@ class DialogoCaracteristicas : public QDialog
     Q_OBJECT
 
 public:
-    explicit DialogoCaracteristicas(QWidget *parent = 0);
+    explicit DialogoCaracteristicas(QWidget *parent = 0,QMainWindow* parentWindow=0,Mat srcImage = Mat(), Mat dstImagePreprocesada = Mat(),Rect ROI = Rect() );
     ~DialogoCaracteristicas();
+
+private slots:
+    void on_CalcularCaracteristicasBT_clicked();
 
 private:
     Ui::DialogoCaracteristicas *ui;
+
+    Mat srcImage;
+    Mat dstImagePreprocesada;
+    Mat dstImagenFinal;
+    Mat dstImagenFinalEndPoints;
+    Rect ROI;
+    double relacionAnchoAlto;
+    QMainWindow* parentWindow;
+
+    void inicializarImagenes();
+
 };
 
 #endif // DIALOGOCARACTERISTICAS_H

@@ -80,30 +80,3 @@ Mat  ControlPreprocesamiento::morphImage( Mat sourceImage){
 
     return morphedImage;
 }
-
-Mat  ControlPreprocesamiento::skeleton( Mat sourceImage){
-    Mat img( sourceImage);
-
-    cv::Mat skel(img.size(), CV_8UC1, cv::Scalar(0));
-    cv::Mat temp(img.size(), CV_8UC1);
-
-    cv::Mat element = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
-
-    bool done;
-    do
-    {
-      cv::morphologyEx(img, temp, cv::MORPH_OPEN, element);
-      cv::bitwise_not(temp, temp);
-      cv::bitwise_and(img, temp, temp);
-      cv::bitwise_or(skel, temp, skel);
-      cv::erode(img, img, element);
-
-      double max;
-      cv::minMaxLoc(img, 0, &max);
-      done = (max == 0);
-    } while (!done);
-
-
-    return skel;
-
-}

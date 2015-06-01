@@ -1,6 +1,12 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "controlpreprocesamiento.h"
+#include "controlsegmentacion.h"
+#include "dialogocaracteristicas.h"
+#include "controlficheros.h"
+
+
 #include <QMainWindow>
 #include <QFileDialog>
 #include <QPixmap>
@@ -11,6 +17,7 @@
 
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
+#include "boost/filesystem.hpp"
 
 using namespace cv;
 using namespace std;
@@ -26,26 +33,22 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    QImage Mat2QImage(const Mat& srcImage);
+    static QImage Mat2QImage(const Mat& srcImage);
 
 private slots:
     void on_calcularUmbralBT_clicked();
-
     void on_abrirImagenBT_clicked();
-
     void on_cierreBT_clicked();
-
     void on_GO_clicked();
-
     void on_AdelgazamientoBT_clicked();
-
     void on_SegmentacionBT_clicked();
-
     void on_AperturaBT_clicked();
-
     void resetWidgets();
-
     void buscarArchivo();
+    void on_CaracteristicasBT_clicked();
+
+    void on_abrirFicheroBT_clicked();
+
 private:
     Mat srcImage;
     Mat dstImageTreshold;
@@ -58,7 +61,8 @@ private:
     Rect dstRectanguloEnvolvente;
 
     QString imageFile;
-
+    QString ficheroAbierto;
+    QStringList imagesDirectory;
     bool ImagenAbierta;
     Ui::MainWindow *ui;
 };
