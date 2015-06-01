@@ -59,7 +59,10 @@ void MainWindow::buscarArchivo()
 
     ui->calcularUmbralBT->setEnabled(true);
 
+
+
     this->srcImage = imread(imageFile.toStdString().data(),0);
+        cv::equalizeHist(this->srcImage,  this->srcImage );
     this->ImagenAbierta = true;
 }
 
@@ -84,7 +87,7 @@ void MainWindow::on_AperturaBT_clicked()
     //erode(dstImageTreshold,dstImageOpening,Mat(),cv::Point(-1,-1),2);
     morphologyEx(this->dstImageTreshold, this->dstImageClose, CV_MOP_DILATE, BStructElement,Point(-1,-1) ,2 );
     //morphologyEx(this->dstImageClose, this->dstImageOpening, CV_MOP_OPEN, BStructElement );
-
+dstImageClose = ControlPreprocesamiento::morphImage(this->dstImageTreshold);
    // imshow("APERTURA",this->dstImageOpening);
     QImage filtradoImage = Mat2QImage(dstImageClose);
     ui->FiltradoMorfologicoLB->setPixmap(QPixmap::fromImage(filtradoImage));
@@ -104,19 +107,19 @@ void MainWindow::on_cierreBT_clicked()
 }
 
 
-
+/**
+ * @brief MainWindow::on_GO_clicked REALIZA EL PROCESAMIENTO AUMÁTICO PARA UNA IMAGEN
+ */
 void MainWindow::on_GO_clicked()
 {
 
 
+    //Path de la imágen
+    String path = "/home/snipercat/Desktop/ETL8/images/GO/000.png";
 
-    //String path = "/home/snipercat/Desktop/ETL8/images/GO/GO.ITSUT_000.png";
-    //const char* image = ;
+    this->srcImage = imread( path , CV_LOAD_IMAGE_GRAYSCALE );// cargamos la imagen en Blanco y negros
 
-    /* //Lo Modifique para que use la srcImage que carga desde el boton de Load
-    Mat imagenBW = imread( path , CV_LOAD_IMAGE_GRAYSCALE );// cargamos la imagen en Blanco y negros
-
-    Cambiar el Tamaño de la imagen en caso de que sea muy grande
+    /*Cambiar el Tamaño de la imagen en caso de que sea muy grande
      * int maxheight = ui->maxHeight->value();
     if(maxheight !=0 && imagenBW->height > maxheight){
         IplImage *resizedImage = cvCreateImage( cvSize( maxheight * (imagenBW->width/(imagenBW->height)) , maxheight) , imagenBW->depth , imagenBW->nChannels);
@@ -125,20 +128,61 @@ void MainWindow::on_GO_clicked()
     }
     */
 
-    imshow("ORIGINAL",this->srcImage);
+    //Colocar la imágen original en el recuadro
+    QImage originalImage = Mat2QImage(this->srcImage);
+    ui->ImagenOriginalLB->setPixmap(QPixmap::fromImage(originalImage));
 
-//Threshold
-    this->dstImageTreshold = ControlPreprocesamiento::umbralAutomatico(this->srcImage);
-    imshow( "Binarizada", this->dstImageTreshold ); // representamos la imagen en la ventana
 
-//Morphologia
-    this->dstImageClose =  ControlPreprocesamiento::morphImage(this->dstImageTreshold);
-    imshow( "Morphed", this->dstImageClose ); // representamos la imagen en la ventana
+    //Equalize
+        Mat equalizedImage;
+        cv::equalizeHist(this->srcImage, equalizedImage);
 
-//Esqueletización
-//    this->dstImageSkeleton = ControlPreprocesamiento::skeleton(this->dstImageClose);
-//    imshow( "skeleton", this->dstImageSkeleton ); // representamos la imagen en la ventana
+        //imshow( "Equalize", equalizedImage ); // representamos la imagen en la ventana
 
+    //Threshold
+        this->dstImageTreshold = ControlPreprocesamiento::umbralAutomatico(equalizedImage);
+            //Colocar la imágen en el recuadro
+            QImage thresholdlImage = Mat2QImage(this->dstImageTreshold);
+            ui->UmbralizacionLB->setPixmap(QPixmap::fromImage(thresholdlImage));
+
+            //imshow( "Binarizada", dstImageTreshold ); // representamos la imagen en la ventana
+
+    //Morphologia
+        this->dstImageClose =  ControlPreprocesamiento::morphImage(this->dstImageTreshold);
+            //Colocar la imágen en el recuadro
+            QImage morphedImage = Mat2QImage(this->dstImageClose);
+            ui->FiltradoMorfologicoLB->setPixmap(QPixmap::fromImage(morphedImage));
+            //imshow( "Morphed", this->dstImageClose ); // representamos la imagen en la ventana
+
+    //Bordes
+        vector<vector<Point> > contours = ControlPreprocesamiento::getContornos( this->dstImageClose);
+        this->dstImageContornos= ControlPreprocesamiento::getContornosImage(this->dstImageClose,contours);
+            //Colocar la imágen en el recuadro
+                QImage contoursImage = Mat2QImage( this->dstImageContornos);
+                ui->ContornosLB->setPixmap(QPixmap::fromImage(contoursImage));
+    //cout<<"Contornos "<<contours.size()<<"\n";
+
+    //MOMENTOS DE HU
+        vector<vector<double> > HuMoments = ControlPreprocesamiento::getHuMoments(contours);
+
+
+/////////////////////////
+   ///SEGMENTACION
+        Mat src = imread(path);
+            ControlSegmentacion::encontrarSegmentos(src,dstImageClose,dstImageSegmentacion,dstRectanguloEnvolvente);
+
+            QImage segmentacionImage = Mat2QImage(this->dstImageSegmentacion);
+            ui->SegmentacionLB->setPixmap(QPixmap::fromImage(segmentacionImage));
+            ui->CaracteristicasBT->setEnabled(true);
+    ///ADELGAZAMIENTO
+            dstImageAdelgazada = Mat::zeros(dstImageClose.size(), CV_8UC1);
+            dstImageClose.copyTo(dstImageAdelgazada);
+            ControlPreprocesamiento::adelgazamiento(dstImageAdelgazada);
+            //Colocar la imágen en el recuadro
+                QImage adelgazamientoImage = Mat2QImage(dstImageAdelgazada);
+                ui->AdelgazamientoLB->setPixmap(QPixmap::fromImage(adelgazamientoImage));
+
+//////////////////////
 
 }
 
@@ -178,6 +222,18 @@ void MainWindow::on_SegmentacionBT_clicked()
 
     QImage segmentacionImage = Mat2QImage(this->dstImageSegmentacion);
     ui->SegmentacionLB->setPixmap(QPixmap::fromImage(segmentacionImage));
+    ui->CaracteristicasBT->setEnabled(true);
+}
+
+void MainWindow::on_CaracteristicasBT_clicked()
+{
+
+    //Bordes
+        vector<vector<Point> > contours;
+        contours = ControlPreprocesamiento::getContornos(this->dstImageClose);
+    //MOMENTOS DE HU
+        vector<vector<double> > HuMoments = ControlPreprocesamiento::getHuMoments(contours);
+        cout<<"HU MOMENTS END;";
 }
 
 
@@ -198,12 +254,16 @@ QImage MainWindow::Mat2QImage(const Mat& srcImage)
 }
 
 
+
+
+
 void MainWindow::resetWidgets()
 {
     ui->calcularUmbralBT->setEnabled(false);
     ui->AdelgazamientoBT->setEnabled(false);
     ui->AperturaBT->setEnabled(false);
     ui->SegmentacionBT->setEnabled(false);
+    ui->CaracteristicasBT->setEnabled(false);
 
     ui->ImagenOriginalLB->clear();
     ui->AdelgazamientoLB->clear();
@@ -213,3 +273,7 @@ void MainWindow::resetWidgets()
     ui->UmbralizacionLB->clear();
 
 }
+
+
+
+

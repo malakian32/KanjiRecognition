@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>816</width>
-    <height>596</height>
+    <height>749</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -97,7 +97,7 @@
       <x>10</x>
       <y>70</y>
       <width>581</width>
-      <height>451</height>
+      <height>611</height>
      </rect>
     </property>
     <property name="widgetResizable">
@@ -109,7 +109,7 @@
        <x>0</x>
        <y>0</y>
        <width>579</width>
-       <height>449</height>
+       <height>609</height>
       </rect>
      </property>
      <layout class="QGridLayout" name="gridLayout">
@@ -225,48 +225,17 @@
           <bool>false</bool>
          </property>
         </widget>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QGroupBox" name="groupBox_5">
-        <property name="title">
-         <string>Segmentación</string>
-        </property>
-        <widget class="QLabel" name="SegmentacionLB">
-         <property name="geometry">
-          <rect>
-           <x>20</x>
-           <y>30</y>
-           <width>130</width>
-           <height>130</height>
-          </rect>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>128</width>
-           <height>128</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>130</width>
-           <height>130</height>
-          </size>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::Box</enum>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="scaledContents">
-          <bool>false</bool>
-         </property>
-        </widget>
+        <zorder>FiltradoMorfologicoLB</zorder>
+        <zorder>groupBox_7</zorder>
+        <zorder>groupBox_5</zorder>
+        <zorder>groupBox_6</zorder>
        </widget>
       </item>
       <item row="1" column="1">
        <widget class="QGroupBox" name="groupBox_6">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
         <property name="title">
          <string>Adelgazamiento</string>
         </property>
@@ -303,8 +272,54 @@
         </widget>
        </widget>
       </item>
+      <item row="1" column="0">
+       <widget class="QGroupBox" name="groupBox_5">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="title">
+         <string>Segmentación</string>
+        </property>
+        <widget class="QLabel" name="SegmentacionLB">
+         <property name="geometry">
+          <rect>
+           <x>20</x>
+           <y>30</y>
+           <width>130</width>
+           <height>130</height>
+          </rect>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>128</width>
+           <height>128</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>130</width>
+           <height>130</height>
+          </size>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::Box</enum>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="scaledContents">
+          <bool>false</bool>
+         </property>
+        </widget>
+        <zorder>SegmentacionLB</zorder>
+        <zorder>groupBox_8</zorder>
+       </widget>
+      </item>
       <item row="1" column="2">
        <widget class="QGroupBox" name="groupBox_7">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
         <property name="title">
          <string>Rectangulo Envolvente</string>
         </property>
@@ -339,6 +354,46 @@
           <bool>false</bool>
          </property>
         </widget>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QGroupBox" name="groupBox_8">
+        <property name="title">
+         <string>Contornos</string>
+        </property>
+        <widget class="QLabel" name="ContornosLB">
+         <property name="geometry">
+          <rect>
+           <x>20</x>
+           <y>30</y>
+           <width>130</width>
+           <height>130</height>
+          </rect>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>128</width>
+           <height>128</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>130</width>
+           <height>130</height>
+          </size>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::Box</enum>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="scaledContents">
+          <bool>false</bool>
+         </property>
+        </widget>
+        <zorder>ContornosLB</zorder>
+        <zorder>ContornosLB</zorder>
        </widget>
       </item>
      </layout>

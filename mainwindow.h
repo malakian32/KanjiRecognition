@@ -46,6 +46,9 @@ private slots:
     void resetWidgets();
 
     void buscarArchivo();
+    void on_CaracteristicasBT_clicked();
+
+
 private:
     Mat srcImage;
     Mat dstImageTreshold;
@@ -54,6 +57,7 @@ private:
     Mat dstImageAdelgazada;
     Mat dstImageSegmentacion;
     Mat dstImageRectanguloEnvolvente;
+    Mat dstImageContornos;
 
     Rect dstRectanguloEnvolvente;
 

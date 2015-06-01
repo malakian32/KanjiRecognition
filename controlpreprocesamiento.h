@@ -5,6 +5,9 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 
+#include <iostream>
+#include <stdio.h>
+
 using namespace cv;
 using namespace std;
 
@@ -20,7 +23,9 @@ public:
     static Mat  morphImage( Mat sourceImage);
     static Mat  skeleton( Mat sourceImage);
     static void adelgazamiento(Mat& srcImage);
-
+    static vector<vector<Point> > getContornos( Mat src_gray);
+    static vector<vector<double> > getHuMoments( vector<vector<Point> >  contours);
+    static Mat  getContornosImage(Mat src_gray, vector<vector<Point> > contours);
 
 private:
     static void iteracionAdelgazamiento(Mat& srcImage, int iteracion );
