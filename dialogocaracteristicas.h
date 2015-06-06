@@ -23,7 +23,7 @@ class DialogoCaracteristicas : public QDialog
     Q_OBJECT
 
 public:
-    explicit DialogoCaracteristicas(QWidget *parent = 0,QMainWindow* parentWindow=0,Mat srcImage = Mat(), Mat dstImagePreprocesada = Mat(),Rect ROI = Rect() );
+    explicit DialogoCaracteristicas(QWidget *parent = 0,QMainWindow* parentWindow=0,Mat srcImage = Mat(), Mat dstImagePreprocesada = Mat(),Rect ROI = Rect(),vector<vector<Point> > contornos = vector<vector<Point> >());
     ~DialogoCaracteristicas();
 
 private slots:
@@ -37,6 +37,8 @@ private:
     Mat dstImagenFinal;
     Mat dstImagenFinalEndPoints;
     Rect ROI;
+    vector<vector<double> > momentosHu;
+    vector<vector<Point> > contornos;
     double relacionAnchoAlto;
     QMainWindow* parentWindow;
 

@@ -23,9 +23,7 @@ public:
     static Mat umbralAutomaticoAdaptativo(Mat sourceImage);
     static Mat morphImage( Mat sourceImage);
     static void adelgazamiento(Mat& srcImage);
-    static vector<vector<Point> > getContornos( Mat src_gray);
-    static vector<vector<double> > getHuMoments( vector<vector<Point> >  contours);
-    static Mat  getContornosImage(Mat src_gray, vector<vector<Point> > contours);
+
 
 private:
     static void iteracionAdelgazamiento(Mat& srcImage, int iteracion );

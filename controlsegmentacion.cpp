@@ -42,7 +42,10 @@ void ControlSegmentacion::encontrarSegmentos(Mat srcImage, Mat srcImagePreproces
     }
 
     circle(markers, Point(5,5), 3, CV_RGB(255,255,255),-1);
-
+    if(srcImage.empty())
+    {
+        cout<<"cabron"<<endl;
+    }
     //Watershed:
 
     watershed(srcImage,markers);

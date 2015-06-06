@@ -3,6 +3,7 @@
 
 #include "controlpreprocesamiento.h"
 #include "controlsegmentacion.h"
+#include "controlobtencioncaracteristicas.h"
 #include "dialogocaracteristicas.h"
 #include "controlficheros.h"
 
@@ -50,21 +51,26 @@ private slots:
 
     void on_abrirFicheroBT_clicked();
 
+    void on_EntrenarBT_clicked();
+
 private:
     Mat srcImage;
-    Mat dstImageTreshold;
+    Mat srcImageEqualizada;
+    Mat dstImageThreshold;
+    Mat dstImageThresholdAdaptative;
     Mat dstImageOpening;
     Mat dstImageClose;
     Mat dstImageAdelgazada;
     Mat dstImageSegmentacion;
     Mat dstImageRectanguloEnvolvente;
     Mat dstImageContornos;
-
+    Mat dstImageFinal;
     Rect dstRectanguloEnvolvente;
 
     QString imageFile;
     QString ficheroAbierto;
-    QStringList imagesDirectory;
+    //QStringList imagesDirectory;
+    vector<pair<string,int> > imagesDirectory;
     bool ImagenAbierta;
     Ui::MainWindow *ui;
 };

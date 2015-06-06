@@ -58,18 +58,23 @@ void MainWindow::buscarArchivo()
     ui->calcularUmbralBT->setEnabled(true);
 
 
-
+    cout<<imageFile.toStdString().data()<<endl;
     this->srcImage = imread(imageFile.toStdString().data(),0);
-        cv::equalizeHist(this->srcImage,  this->srcImage );
+    line(srcImage,Point(0,0),Point(0,srcImage.rows),Scalar(255),20);
+    line(srcImage,Point(0,0),Point(srcImage.cols,0),Scalar(255),20);
+    line(srcImage,Point(srcImage.cols,srcImage.rows),Point(srcImage.cols,0),Scalar(255),20);
+    line(srcImage,Point(srcImage.cols,srcImage.rows),Point(0,srcImage.cols),Scalar(255),20);
+
+    equalizeHist(this->srcImage,  this->srcImageEqualizada );
     this->ImagenAbierta = true;
 }
 
 void MainWindow::on_calcularUmbralBT_clicked()
 {
-    this->dstImageTreshold = ControlPreprocesamiento::umbralAutomaticoAdaptativo(srcImage);
+    this->dstImageThresholdAdaptative = ControlPreprocesamiento::umbralAutomaticoAdaptativo(srcImage);
+    this->dstImageThreshold = ControlPreprocesamiento::umbralAutomatico(srcImageEqualizada);
 
-
-    QImage umbralImage = Mat2QImage(dstImageTreshold);
+    QImage umbralImage = Mat2QImage(dstImageThresholdAdaptative);
     ui->UmbralizacionLB->setPixmap(QPixmap::fromImage(umbralImage));
 
     ui->AperturaBT->setEnabled(true);
@@ -80,11 +85,13 @@ void MainWindow::on_calcularUmbralBT_clicked()
 void MainWindow::on_AperturaBT_clicked()
 {
     Mat BStructElement = getStructuringElement(CV_SHAPE_RECT,Size(2,2));
+
     //erode(dstImageTreshold,dstImageOpening,Mat(),cv::Point(-1,-1),2);
-    morphologyEx(this->dstImageTreshold, this->dstImageClose, CV_MOP_DILATE, BStructElement,Point(-1,-1) ,2 );
-    //morphologyEx(this->dstImageClose, this->dstImageOpening, CV_MOP_OPEN, BStructElement );
-    dstImageClose = ControlPreprocesamiento::morphImage(this->dstImageTreshold);
-   // imshow("APERTURA",this->dstImageOpening);
+    morphologyEx(this->dstImageThresholdAdaptative, this->dstImageClose, CV_MOP_CLOSE, BStructElement,Point(-1,-1) ,1 );
+//    morphologyEx(this->dstImageClose, this->dstImageClose, CV_MOP_ERODE, BStructElementB,Point(-1,-1) ,1 );
+
+//    morphologyEx(this->dstImageClose, this->dstImageClose, CV_MOP_CLOSE, BStructElementB,Point(-1,-1) ,1 );
+
     QImage filtradoImage = Mat2QImage(dstImageClose);
     ui->FiltradoMorfologicoLB->setPixmap(QPixmap::fromImage(filtradoImage));
 
@@ -94,9 +101,9 @@ void MainWindow::on_AperturaBT_clicked()
 
 void MainWindow::on_cierreBT_clicked()
 {
-    Mat BStructElement = getStructuringElement(CV_SHAPE_RECT,Size(3,3));
+    Mat BStructElement = getStructuringElement(CV_SHAPE_RECT,Size(2,2));
 
-    morphologyEx(this->dstImageOpening, this->dstImageClose, CV_MOP_CLOSE, BStructElement );
+    morphologyEx(this->dstImageOpening, this->dstImageClose, CV_MOP_DILATE, BStructElement );
 
     imshow("CIERRE",this->dstImageClose);
 }
@@ -193,10 +200,10 @@ void MainWindow::on_AdelgazamientoBT_clicked()
     dstImageAdelgazada.copyTo(dstImageRectanguloEnvolvente);
     //Se suman 3 pixeles de distancia a las medidas del rectangulo para darle espacio
     //alalgoritmo de busqueda de end-points
-    dstRectanguloEnvolvente.height += 6;
-    dstRectanguloEnvolvente.width += 6;
-    dstRectanguloEnvolvente.x -= 3;
-    dstRectanguloEnvolvente.y -= 3;
+    dstRectanguloEnvolvente.height += 10;
+    dstRectanguloEnvolvente.width += 10;
+    dstRectanguloEnvolvente.x -= 5;
+    dstRectanguloEnvolvente.y -= 5;
 
     rectangle(dstImageRectanguloEnvolvente,dstRectanguloEnvolvente,Scalar(255));
 
@@ -220,7 +227,6 @@ void MainWindow::on_SegmentacionBT_clicked()
     QImage segmentacionImage = Mat2QImage(this->dstImageSegmentacion);
     ui->SegmentacionLB->setPixmap(QPixmap::fromImage(segmentacionImage));
     ui->AdelgazamientoBT->setEnabled(true);
-
 }
 /*
 void MainWindow::on_CaracteristicasBT_clicked()
@@ -255,7 +261,12 @@ QImage MainWindow::Mat2QImage(const Mat& srcImage)
 
 void MainWindow::on_CaracteristicasBT_clicked()
 {
-    DialogoCaracteristicas* dialogoCaracteristicas = new DialogoCaracteristicas(this,this,srcImage,dstImageAdelgazada,dstRectanguloEnvolvente);
+
+    Mat dstImageMorph = ControlPreprocesamiento::morphImage(dstImageThreshold);
+    vector<vector<Point> > contornos;
+    contornos = ControlObtencionCaracteristicas::getContornos(dstImageMorph(dstRectanguloEnvolvente).clone());
+
+    DialogoCaracteristicas* dialogoCaracteristicas = new DialogoCaracteristicas(this,this,srcImage,dstImageAdelgazada,dstRectanguloEnvolvente,contornos);
 
     dialogoCaracteristicas->show();
 }
@@ -286,7 +297,104 @@ void MainWindow::on_abrirFicheroBT_clicked()
     this->ficheroAbierto = QFileDialog::getExistingDirectory(this,tr("Abrir Directorio"),"./resources",QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 
     ControlFicheros::abrirFichero(path(ficheroAbierto.toStdString()),imagesDirectory);
+    string nombreFichero = path(ficheroAbierto.toStdString()).filename().c_str();
+    ostringstream numeroArchivos;
+    numeroArchivos<<imagesDirectory.size();
 
     ui->URLFicherLB->setText(ficheroAbierto);
+    ui->NombreFicheroLB->setText(QString::fromStdString(nombreFichero));
+    ui->SizeFicheroLB->setText(QString::fromStdString(numeroArchivos.str()));
+    ui->EntrenarBT->setEnabled(true
+                               );
 
+
+}
+
+void MainWindow::on_EntrenarBT_clicked()
+{
+    FILE* archivoCaracteristicas = fopen("./resources/ArchivoCaracteristicasDataSet.txt","w");
+    for(int i = 0; i<imagesDirectory.size();i++)
+    {
+        cout<<imagesDirectory.at(i).first.data()<<endl;
+        //ABRIR IMAGEN
+        srcImage = imread(imagesDirectory.at(i).first.data(),
+                                0);
+        line(srcImage,Point(0,0),Point(0,srcImage.rows),Scalar(255),20);
+        line(srcImage,Point(0,0),Point(srcImage.cols,0),Scalar(255),20);
+        line(srcImage,Point(srcImage.cols,srcImage.rows),Point(srcImage.cols,0),Scalar(255),20);
+        line(srcImage,Point(srcImage.cols,srcImage.rows),Point(0,srcImage.cols),Scalar(255),20);
+
+        equalizeHist(srcImage,srcImageEqualizada);
+        //CALCULAR THRESHOLD
+        this->dstImageThresholdAdaptative = ControlPreprocesamiento::umbralAutomaticoAdaptativo(srcImage);
+        this->dstImageThreshold = ControlPreprocesamiento::umbralAutomatico(srcImageEqualizada);
+
+        //FILTRADO
+        Mat BStructElement = getStructuringElement(CV_SHAPE_RECT,Size(2,2));
+        morphologyEx(this->dstImageThresholdAdaptative, this->dstImageClose, CV_MOP_CLOSE, BStructElement,Point(-1,-1) ,1 );
+
+        //SEGMENTACION
+        Mat src = imread(imagesDirectory.at(i).first);
+        ControlSegmentacion::encontrarSegmentos(src,dstImageClose,dstImageSegmentacion,dstRectanguloEnvolvente);
+
+        //ADELGAZAMIENTO
+        dstImageAdelgazada = Mat::zeros(dstImageClose.size(), CV_8UC1);
+        dstImageClose.copyTo(dstImageAdelgazada);
+
+        ControlPreprocesamiento::adelgazamiento(dstImageAdelgazada);
+
+        dstImageAdelgazada.copyTo(dstImageRectanguloEnvolvente);
+        //Se suman 3 pixeles de distancia a las medidas del rectangulo para darle espacio
+        //alalgoritmo de busqueda de end-points
+        if(dstRectanguloEnvolvente.x <= 5 || dstRectanguloEnvolvente.y <= 5 ) continue;
+        dstRectanguloEnvolvente.height += 10;
+        dstRectanguloEnvolvente.width += 10;
+        dstRectanguloEnvolvente.x -= 5;
+        dstRectanguloEnvolvente.y -= 5;
+
+        rectangle(dstImageRectanguloEnvolvente,dstRectanguloEnvolvente,Scalar(255));
+
+        //CALCULO CARACTERISTICAS
+        cout<<"ancho "<<dstRectanguloEnvolvente.width<<endl;
+        cout<<"alto "<<dstRectanguloEnvolvente.height<<endl;
+        cout<<"x "<<dstRectanguloEnvolvente.x<<endl;
+        cout<<"y "<<dstRectanguloEnvolvente.y<<endl;
+        cout<<dstImageAdelgazada.rows<<endl;
+
+        dstImageFinal = dstImageAdelgazada(dstRectanguloEnvolvente).clone();
+        double relacionAnchoAlto = (double)dstImageFinal.cols/dstImageFinal.rows;
+
+        vector<Point> endPoints;
+        ControlObtencionCaracteristicas::buscarEndPoints(dstImageFinal,endPoints);
+        cout<<endPoints.size()<<endl;
+
+        Mat dstImageMorph = ControlPreprocesamiento::morphImage(dstImageThreshold);
+        vector<vector<Point> > contornos;
+
+        contornos = ControlObtencionCaracteristicas::getContornos(dstImageMorph);
+        vector<vector<double> > momentosHu = ControlObtencionCaracteristicas::getHuMoments(contornos);
+
+        cout<<momentosHu.at(0).at(0)<<","
+            <<momentosHu.at(0).at(1)<<","
+            <<momentosHu.at(0).at(2)<<","
+            <<momentosHu.at(0).at(3)<<","
+            <<momentosHu.at(0).at(4)<<","
+            <<momentosHu.at(0).at(5)<<","
+            <<momentosHu.at(0).at(6)<<","
+            <<endl;
+        fprintf(archivoCaracteristicas,"%f,%f,%f,%f,%f,%f,%f,%f,%d,%d\n",
+              momentosHu.at(0).at(0),
+              momentosHu.at(0).at(1),
+              momentosHu.at(0).at(2),
+              momentosHu.at(0).at(3),
+              momentosHu.at(0).at(4),
+              momentosHu.at(0).at(5),
+              momentosHu.at(0).at(0),
+              relacionAnchoAlto,
+              endPoints.size(),
+              imagesDirectory.at(i).second);
+
+
+    }
+    fclose(archivoCaracteristicas);
 }

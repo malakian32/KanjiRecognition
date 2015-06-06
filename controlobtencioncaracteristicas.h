@@ -17,6 +17,9 @@ public:
     ~ControlObtencionCaracteristicas();
     static void buscarEndPoints(Mat srcImage, vector<Point>& endPoints);
 
+    static vector<vector<Point> > getContornos( Mat src_gray);
+    static vector<vector<double> > getHuMoments( vector<vector<Point> >  contours);
+    static Mat  getContornosImage(Mat src_gray, vector<vector<Point> > contours);
 };
 
 #endif // CONTROLOBTENCIONCARACTERISTICAS_H
