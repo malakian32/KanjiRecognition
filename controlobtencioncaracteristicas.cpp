@@ -57,10 +57,11 @@ vector<vector<double> > ControlObtencionCaracteristicas::getHuMoments( vector<ve
 }
 
 
-void ControlObtencionCaracteristicas::buscarEndPoints(Mat srcImage, vector<Point> &endPoints)
+void ControlObtencionCaracteristicas::buscarEndPoints(Mat srcImage, vector<Point> &endPoints, vector<Point> &intersectPoints)
 {
     Mat srcImageNormalizada = srcImage/255;
     vector<Point> endPointsEncontrados;
+    vector<Point> intersectPointsEncontrados;
 
     int tamanoVecindad = 9;
     for(int i = 0; i < srcImageNormalizada.rows-2; i++)
@@ -90,7 +91,9 @@ void ControlObtencionCaracteristicas::buscarEndPoints(Mat srcImage, vector<Point
    //             i+=2;
             }
 
-
+            if(valorAbsoluto == 5 && vecindad9[0]== 0 && vecindad9[2]== 0 && vecindad9[6]== 0 && vecindad9[8]== 0 ){
+                intersectPointsEncontrados.push_back(Point(j+1, i+1) );
+            }
             else continue;
 
         }
@@ -98,6 +101,7 @@ void ControlObtencionCaracteristicas::buscarEndPoints(Mat srcImage, vector<Point
 
 
     endPoints = endPointsEncontrados;
+    intersectPoints = intersectPointsEncontrados;
 }
 
 

@@ -43,7 +43,7 @@ private:
     QMainWindow* parentWindow;
     void inicializarImagenes();
 
-    char *srcNetworkFile = "/home/snipercat/Desktop/NeuralNetwork.xml";
+    //char *srcNetworkFile = "/home/snipercat/Desktop/NeuralNetwork.xml";
 
 };
 

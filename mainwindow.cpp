@@ -314,7 +314,7 @@ void MainWindow::on_EntrenarBT_clicked()
 {
     //QUITAR COMENTARIO PARA HACER PRUEBAS CON DISTINTAS CONFIGURACIONES DE RED NEURONAL TENIENDO
     //EL ARCHIVO DE CARACTERÍSTICAS
-        //controlredneuronal::train( srcDataSetFile, srcNetworkFile  );
+        //controlredneuronal::train( "/home/snipercat/Desktop/ArchivoCaracteristicasDataSet.csv", "/home/snipercat/Desktop/NeuralNetwork.xml"  );
         //return;
 
     //FILE* archivoCaracteristicas = fopen("./Resources/ArchivoCaracteristicasDataSet.txt","w");
@@ -324,12 +324,11 @@ void MainWindow::on_EntrenarBT_clicked()
     {
         cout<<imagesDirectory.at(i).first.data()<<endl;
         //ABRIR IMAGEN
-        srcImage = imread(imagesDirectory.at(i).first.data(),
-                                0);
+        srcImage = imread(imagesDirectory.at(i).first.data(),0);
         line(srcImage,Point(0,0),Point(0,srcImage.rows),Scalar(255),20);
         line(srcImage,Point(0,0),Point(srcImage.cols,0),Scalar(255),20);
         line(srcImage,Point(srcImage.cols,srcImage.rows),Point(srcImage.cols,0),Scalar(255),20);
-        line(srcImage,Point(srcImage.cols,srcImage.rows),Point(0,srcImage.cols),Scalar(255),20);
+        line(srcImage,Point(srcImage.cols,srcImage.rows),Point(0,srcImage.rows),Scalar(255),20);
 
         equalizeHist(srcImage,srcImageEqualizada);
         //CALCULAR THRESHOLD
@@ -344,7 +343,7 @@ void MainWindow::on_EntrenarBT_clicked()
         Mat src = imread(imagesDirectory.at(i).first);
         ControlSegmentacion::encontrarSegmentos(src,dstImageClose,dstImageSegmentacion,dstRectanguloEnvolvente);
 
-        //ADELGAZAMIENTO
+        //ADELGAZAMIENTOsrcImage
         dstImageAdelgazada = Mat::zeros(dstImageClose.size(), CV_8UC1);
         dstImageClose.copyTo(dstImageAdelgazada);
 
@@ -372,7 +371,8 @@ void MainWindow::on_EntrenarBT_clicked()
         double relacionAnchoAlto = (double)dstImageFinal.cols/dstImageFinal.rows;
 
         vector<Point> endPoints;
-        ControlObtencionCaracteristicas::buscarEndPoints(dstImageFinal,endPoints);
+        vector<Point> insersectPoints;
+        ControlObtencionCaracteristicas::buscarEndPoints(dstImageFinal,endPoints, insersectPoints);
         cout<<endPoints.size()<<endl;
 
         Mat dstImageMorph = ControlPreprocesamiento::morphImage(dstImageThreshold);
@@ -387,9 +387,27 @@ void MainWindow::on_EntrenarBT_clicked()
             <<momentosHu.at(0).at(3)<<","
             <<momentosHu.at(0).at(4)<<","
             <<momentosHu.at(0).at(5)<<","
-            <<momentosHu.at(0).at(6)<<","
+            <<momentosHu.at(0).at(6)<2<","
             <<endl;*/
-        fprintf(archivoCaracteristicas,"%f;%f;%f;%f;%f;%f;%f;%f;%d;%d;%d\n",
+
+        //Determina a cual cuadrante pertenece cada punto
+        int cuadrante1 = 0;
+        int cuadrante2 = 0;
+        int cuadrante3 = 0;
+        int cuadrante4 = 0;
+        int mitadX = int(dstImageFinal.cols/2);
+        int mitadY = int(dstImageFinal.rows/2);
+        Point p;
+
+        for(unsigned c = 0; c< endPoints.size();c++){
+            p = endPoints.at(c);
+            if( p.x >= mitadX && p.y <  mitadY ){ cuadrante1++; }
+            if( p.x <  mitadX && p.y <  mitadY ){ cuadrante2++; }
+            if( p.x <  mitadX && p.y >= mitadY ){ cuadrante3++; }
+            if( p.x >= mitadX && p.y >= mitadY ){ cuadrante4++; }
+        }
+
+        fprintf(archivoCaracteristicas,"%f;%f;%f;%f;%f;%f;%f;%f;%d;%d;%d;%d;%d;%d;%d\n",
               momentosHu.at(0).at(0),
               momentosHu.at(0).at(1),
               momentosHu.at(0).at(2),
@@ -399,15 +417,14 @@ void MainWindow::on_EntrenarBT_clicked()
               momentosHu.at(0).at(6),
               relacionAnchoAlto,
               endPoints.size(),
+              //insersectPoints.size(),
+              cuadrante1,
+              cuadrante2,
+              cuadrante3,
+              cuadrante4,
               contornos.size(),
               imagesDirectory.at(i).second);
-/*
-        fprintf(archivoCaracteristicas,"%f;%d;%d;%d\n",
-              relacionAnchoAlto,
-              endPoints.size(),
-              contornos.size(),
-              imagesDirectory.at(i).second);
-*/
+
     }
 
     fclose(archivoCaracteristicas);
