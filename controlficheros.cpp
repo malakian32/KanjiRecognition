@@ -24,7 +24,7 @@ void ControlFicheros::abrirFichero(const path& dirPath,vector<pair<string,int> >
                             ("JUU",10)
                             ("HYAKU",11)
                             ("SEN",12);
-
+    imagesDirectory.clear();
     if(is_directory(dirPath))
     {
         cout<<"En el fichero: "<<dirPath<<endl;

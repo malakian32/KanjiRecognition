@@ -6,6 +6,7 @@
 #include "controlobtencioncaracteristicas.h"
 #include "dialogocaracteristicas.h"
 #include "controlficheros.h"
+#include "controlredneuronal.h"
 
 
 #include <QMainWindow>
@@ -73,6 +74,10 @@ private:
     vector<pair<string,int> > imagesDirectory;
     bool ImagenAbierta;
     Ui::MainWindow *ui;
+
+    //char *srcNetworkFile = "/home/snipercat/Desktop/NeuralNetwork.xml";
+    //char *srcDataSetFile = "/home/snipercat/Desktop/ArchivoCaracteristicasDataSet.csv";
+
 };
 
 #endif // MAINWINDOW_H

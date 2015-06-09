@@ -41,8 +41,9 @@ private:
     vector<vector<Point> > contornos;
     double relacionAnchoAlto;
     QMainWindow* parentWindow;
-
     void inicializarImagenes();
+
+    char *srcNetworkFile = "/home/snipercat/Desktop/NeuralNetwork.xml";
 
 };
 

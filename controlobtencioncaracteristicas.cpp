@@ -20,7 +20,7 @@ ControlObtencionCaracteristicas::~ControlObtencionCaracteristicas()
 Mat ControlObtencionCaracteristicas::getContornosImage(Mat src_gray, vector<vector<Point> > contours){
     Mat drawing = Mat::zeros( src_gray.size(), CV_8UC3 );
     RNG rng(12345);
-    for( int i = 0; i< contours.size(); i++ )
+    for( unsigned i = 0; i< contours.size(); i++ )
        {
          Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
          //drawContours( drawing, contours, i, color, 1, 8, hierarchy, 0, Point() );
@@ -36,7 +36,7 @@ vector<vector<double> > ControlObtencionCaracteristicas::getHuMoments( vector<ve
     vector<vector<double> > HuMoments;
     HuMoments.resize(contours.size());
 
-    for( int i = 0; i< contours.size(); i++ )
+    for( unsigned i = 0; i< contours.size(); i++ )
        {
         // From the example you posted, you already know how to compute the contours
         // so let's take just the first one and compute the moments
@@ -45,11 +45,11 @@ vector<vector<double> > ControlObtencionCaracteristicas::getHuMoments( vector<ve
         cv::HuMoments(mom, hu); // now in hu are your 7 Hu-Moments
 
         //resize Vector and copy hu Moments Values to the vector
-        cout<<"Contourn "<<i<<"\n";
+        //cout<<"Contourn "<<i<<"\n";
         HuMoments[i].resize(7);
         for(int c = 0; c < 7; c++ ){
             HuMoments[i][c] = hu[c];
-            cout<<"\tHu["<<c<<"]="<<hu[c]<<"\n";
+            //cout<<"\tHu["<<c<<"]="<<hu[c]<<"\n";
         }
        }
 
@@ -61,6 +61,7 @@ void ControlObtencionCaracteristicas::buscarEndPoints(Mat srcImage, vector<Point
 {
     Mat srcImageNormalizada = srcImage/255;
     vector<Point> endPointsEncontrados;
+
     int tamanoVecindad = 9;
     for(int i = 0; i < srcImageNormalizada.rows-2; i++)
     {
@@ -88,6 +89,8 @@ void ControlObtencionCaracteristicas::buscarEndPoints(Mat srcImage, vector<Point
                 endPointsEncontrados.push_back(Point(j+1, i+1));
    //             i+=2;
             }
+
+
             else continue;
 
         }
@@ -95,7 +98,6 @@ void ControlObtencionCaracteristicas::buscarEndPoints(Mat srcImage, vector<Point
 
 
     endPoints = endPointsEncontrados;
-
 }
 
 
@@ -112,7 +114,7 @@ vector<vector<Point> > ControlObtencionCaracteristicas::getContornos( Mat src_gr
    Canny( src_gray, canny_output, thresh, thresh*2, 3 );
    /// Find contours
    findContours( canny_output, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
-
+/*
    //Add the contours to only one vector.
    for( int i = 0; i< contours.size(); i++){
       ret[0].insert(ret[0].end(), contours[i].begin(), contours[i].end());
@@ -123,4 +125,6 @@ vector<vector<Point> > ControlObtencionCaracteristicas::getContornos( Mat src_gr
    //cout<<"Size Total Vector: IS "<< ret[0].size()<<" and the total size IS "<<size<<"\n";
 
    return ret;
+   */
+   return contours;
 }

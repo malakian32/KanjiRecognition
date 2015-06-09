@@ -312,8 +312,15 @@ void MainWindow::on_abrirFicheroBT_clicked()
 
 void MainWindow::on_EntrenarBT_clicked()
 {
-    FILE* archivoCaracteristicas = fopen("./resources/ArchivoCaracteristicasDataSet.txt","w");
-    for(int i = 0; i<imagesDirectory.size();i++)
+    //QUITAR COMENTARIO PARA HACER PRUEBAS CON DISTINTAS CONFIGURACIONES DE RED NEURONAL TENIENDO
+    //EL ARCHIVO DE CARACTERÍSTICAS
+        //controlredneuronal::train( srcDataSetFile, srcNetworkFile  );
+        //return;
+
+    //FILE* archivoCaracteristicas = fopen("./Resources/ArchivoCaracteristicasDataSet.txt","w");
+    FILE* archivoCaracteristicas = fopen("/home/snipercat/Desktop/ArchivoCaracteristicasDataSet.csv","w");
+
+    for(unsigned i = 0; i<imagesDirectory.size();i++)
     {
         cout<<imagesDirectory.at(i).first.data()<<endl;
         //ABRIR IMAGEN
@@ -374,27 +381,39 @@ void MainWindow::on_EntrenarBT_clicked()
         contornos = ControlObtencionCaracteristicas::getContornos(dstImageMorph);
         vector<vector<double> > momentosHu = ControlObtencionCaracteristicas::getHuMoments(contornos);
 
-        cout<<momentosHu.at(0).at(0)<<","
+     /*   cout<<momentosHu.at(0).at(0)<<","
             <<momentosHu.at(0).at(1)<<","
             <<momentosHu.at(0).at(2)<<","
             <<momentosHu.at(0).at(3)<<","
             <<momentosHu.at(0).at(4)<<","
             <<momentosHu.at(0).at(5)<<","
             <<momentosHu.at(0).at(6)<<","
-            <<endl;
-        fprintf(archivoCaracteristicas,"%f,%f,%f,%f,%f,%f,%f,%f,%d,%d\n",
+            <<endl;*/
+        fprintf(archivoCaracteristicas,"%f;%f;%f;%f;%f;%f;%f;%f;%d;%d;%d\n",
               momentosHu.at(0).at(0),
               momentosHu.at(0).at(1),
               momentosHu.at(0).at(2),
               momentosHu.at(0).at(3),
               momentosHu.at(0).at(4),
               momentosHu.at(0).at(5),
-              momentosHu.at(0).at(0),
+              momentosHu.at(0).at(6),
               relacionAnchoAlto,
               endPoints.size(),
+              contornos.size(),
               imagesDirectory.at(i).second);
-
-
+/*
+        fprintf(archivoCaracteristicas,"%f;%d;%d;%d\n",
+              relacionAnchoAlto,
+              endPoints.size(),
+              contornos.size(),
+              imagesDirectory.at(i).second);
+*/
     }
+
     fclose(archivoCaracteristicas);
+
+    //controlredneuronal::train( srcDataSetFile, srcNetworkFile  );
+    controlredneuronal::train( "/home/snipercat/Desktop/ArchivoCaracteristicasDataSet.csv", "/home/snipercat/Desktop/NeuralNetwork.xml"  );
+
+
 }

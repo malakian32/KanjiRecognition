@@ -64,5 +64,30 @@ void DialogoCaracteristicas::on_CalcularCaracteristicasBT_clicked()
     endPOS<<endPoints.size();
     ui->EndPointsLB->setText(QString::fromStdString(endPOS.str()));
 
+    ///
+    controlredneuronal red = controlredneuronal(srcNetworkFile);
+    cv::Mat caracteristicas(1,10,CV_32F);
+
+
+    caracteristicas.at<float>(0, 0) = momentosHu.at(0).at(0);
+    caracteristicas.at<float>(0, 1) = momentosHu.at(0).at(1);
+    caracteristicas.at<float>(0, 2) = momentosHu.at(0).at(2);
+    caracteristicas.at<float>(0, 3) = momentosHu.at(0).at(3);
+    caracteristicas.at<float>(0, 4) = momentosHu.at(0).at(4);
+    caracteristicas.at<float>(0, 5) = momentosHu.at(0).at(5);
+    caracteristicas.at<float>(0, 6) = momentosHu.at(0).at(6);
+    caracteristicas.at<float>(0, 7) = relacionAnchoAlto;
+    caracteristicas.at<float>(0, 8) = endPoints.size();
+    caracteristicas.at<float>(0, 9) = contornos.size();
+
+     cv::Mat caracteristica(1,3,CV_32F);
+     caracteristica.at<float>(0, 0) = relacionAnchoAlto;
+     caracteristica.at<float>(0, 1) = endPoints.size();
+     caracteristica.at<float>(0, 2) = contornos.size();
+
+
+    int number = red.predict( caracteristica );
+    cout<<"THE NUMBER IS: "<<number<<endl;
+
 }
 
