@@ -1,7 +1,7 @@
 #include "dialogocaracteristicas.h"
 #include "ui_dialogocaracteristicas.h"
 
-DialogoCaracteristicas::DialogoCaracteristicas(QWidget *parent,QMainWindow* parentWindow, Mat srcImage, Mat dstImagePreprocesada, Rect ROI,vector<vector<Point> > contornos) :
+DialogoCaracteristicas::DialogoCaracteristicas(QWidget *parent,QMainWindow* parentWindow, Mat srcImage, Mat dstImagePreprocesada, Rect ROI,vector<vector<Point> > contornos, int number) :
     QDialog(parent),
     ui(new Ui::DialogoCaracteristicas)
 {
@@ -9,8 +9,7 @@ DialogoCaracteristicas::DialogoCaracteristicas(QWidget *parent,QMainWindow* pare
     this->dstImagePreprocesada = dstImagePreprocesada;
     this->ROI = ROI;
     this->dstImagenFinal = dstImagePreprocesada(ROI).clone();
-
-
+    this->number = number;
     cout<<"x " <<ROI.x<<endl;
     cout<<"y " <<ROI.y<<endl;
     this->parentWindow = parentWindow;
@@ -68,7 +67,7 @@ void DialogoCaracteristicas::on_CalcularCaracteristicasBT_clicked()
        vector<Point > poligono = ControlObtencionCaracteristicas::getEnvolvingPolygon( contornos);
        Mat poligonoimagen = ControlObtencionCaracteristicas::getEnvolvingPolygonImage(srcImage, poligono);
        vector<vector<Point > > contornoPoligono = ControlObtencionCaracteristicas::getContornos(poligonoimagen);
-       //imshow("pol", poligonoimagen);
+       imshow("pol", srcImage);
      this->momentosHu = ControlObtencionCaracteristicas::getHuMoments(contornoPoligono);\
 
 
@@ -195,6 +194,7 @@ void DialogoCaracteristicas::on_CalcularCaracteristicasBT_clicked()
 
     valorPredecido = red.predict( caracteristicas );
     cout<<"THE NUMBER IS: "<<valorPredecido<<endl;
+    ui->kanjiReconocidoLB->setText(QString("%1").arg(number));
 /*
     ostringstream valorPredOS;
     valorPredOS<<valorPredecido;
@@ -226,4 +226,6 @@ void DialogoCaracteristicas::on_CalcularCaracteristicasBT_clicked()
     string temp = clases.find(valorPredecido)->second;
     ui->kanjiReconocidoLB->setText(QString::fromStdString(valorPredOS.str() + " - " + temp));*/
 }
+
+
 

@@ -60,6 +60,7 @@ private slots:
 
     void on_EntrenarBT_2_clicked();
 
+    int getNumber();
 private:
     Mat srcImage;
     Mat srcImageEqualizada;
@@ -82,6 +83,7 @@ private:
     bool ImagenAbierta;
     Ui::MainWindow *ui;
 
+    int number;
     //char *srcNetworkFile = "/home/snipercat/Desktop/NeuralNetwork.xml";
     //char *srcDataSetFile = "/home/snipercat/Desktop/ArchivoCaracteristicasDataSet.csv";
 
