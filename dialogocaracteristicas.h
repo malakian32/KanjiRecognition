@@ -36,12 +36,15 @@ private:
     Mat dstImagePreprocesada;
     Mat dstImagenFinal;
     Mat dstImagenFinalEndPoints;
+    int valorPredecido;
+
     Rect ROI;
     vector<vector<double> > momentosHu;
     vector<vector<Point> > contornos;
     double relacionAnchoAlto;
     QMainWindow* parentWindow;
     void inicializarImagenes();
+
 
     //char *srcNetworkFile = "/home/snipercat/Desktop/NeuralNetwork.xml";
 

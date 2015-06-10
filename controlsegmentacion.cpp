@@ -25,7 +25,7 @@ void ControlSegmentacion::encontrarSegmentos(Mat srcImage, Mat srcImagePreproces
     Estas son las semillas para los Kanjis
     */
     Mat dist8U;
-    dist.convertTo(dist8U,CV_8U);
+    srcImagePreprocesada.convertTo(dist8U,CV_8U);
 
     vector<vector <Point> > contours;
     findContours(dist8U, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);

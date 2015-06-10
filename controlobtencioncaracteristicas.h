@@ -15,7 +15,7 @@ class ControlObtencionCaracteristicas
 public:
     ControlObtencionCaracteristicas();
     ~ControlObtencionCaracteristicas();
-    static void buscarEndPoints(Mat srcImage, vector<Point>& endPoints, vector<Point> &intersectPoints);
+    static void buscarPuntos(Mat srcImage, vector<Point>& endPoints, vector<Point> &intersectPoints);
 
     static vector<vector<Point> > getContornos( Mat src_gray);
     static vector<vector<double> > getHuMoments( vector<vector<Point> >  contours);

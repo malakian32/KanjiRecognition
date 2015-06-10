@@ -14,11 +14,11 @@ using namespace cv;
 using namespace std;
 
 
-#define TRAINING_SAMPLES 1200    //Number of samples in training dataset
-#define ATTRIBUTES 14  		  //Number of hu moments
+#define TRAINING_SAMPLES 1196    //Number of samples in training dataset
+#define ATTRIBUTES 19  		  //Number of hu moments
 #define TEST_SAMPLES 732       //Number of samples in test dataset
 #define CLASSES 12             //Number of distinct labels. 1 or 0
-#define HIDDEN_NEURONES 13       //NUMBER OF HIDDEN NEURONES
+#define HIDDEN_NEURONES 30       //NUMBER OF HIDDEN NEURONES
 
 //#define srcTestDataSetFile "/home/snipercat/Desktop/ArchivoCaracteristicasTestSet.csv"
 class controlredneuronal

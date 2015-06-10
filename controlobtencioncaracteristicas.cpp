@@ -57,12 +57,14 @@ vector<vector<double> > ControlObtencionCaracteristicas::getHuMoments( vector<ve
 }
 
 
-void ControlObtencionCaracteristicas::buscarEndPoints(Mat srcImage, vector<Point> &endPoints, vector<Point> &intersectPoints)
+void ControlObtencionCaracteristicas::buscarPuntos(Mat srcImage, vector<Point> &endPoints, vector<Point> &intersectPoints)
 {
+
+
+
     Mat srcImageNormalizada = srcImage/255;
     vector<Point> endPointsEncontrados;
     vector<Point> intersectPointsEncontrados;
-
     int tamanoVecindad = 9;
     for(int i = 0; i < srcImageNormalizada.rows-2; i++)
     {
@@ -80,21 +82,64 @@ void ControlObtencionCaracteristicas::buscarEndPoints(Mat srcImage, vector<Point
             vecindad9[8] = srcImageNormalizada.at<uchar>(i+2,j+2);
 
             int valorAbsoluto = 0;
+
             for(int k=0; k < tamanoVecindad; k++)
             {
                 valorAbsoluto += vecindad9[k];
             }
 
-            if(valorAbsoluto==2 && vecindad9[4]==1)
-            {
-                endPointsEncontrados.push_back(Point(j+1, i+1));
-   //             i+=2;
-            }
+            if(vecindad9[4] == 1){
 
-            if(valorAbsoluto == 5 && vecindad9[0]== 0 && vecindad9[2]== 0 && vecindad9[6]== 0 && vecindad9[8]== 0 ){
-                intersectPointsEncontrados.push_back(Point(j+1, i+1) );
+
+
+                //END POINTS
+                if(valorAbsoluto==2)
+                {
+                    endPointsEncontrados.push_back(Point(j+1, i+1));
+                    //             i+=2;
+                }
+
+                //INTERSECCIONES
+                if(valorAbsoluto == 5 && vecindad9[0]== 0 && vecindad9[2]== 0 && vecindad9[6]== 0 && vecindad9[8]== 0 ){
+                    intersectPointsEncontrados.push_back(Point(j+1, i+1) );
+                }
+
+//                if(valorAbsoluto >= 4)
+//                {
+//                    intersectPointsEncontrados.push_back(Point(j+1, i+1) );
+
+//                }
+
+                if(valorAbsoluto == 4 &&
+                        ((vecindad9[3]==1 && vecindad9[1] == 1 && (vecindad9[5] == 1 || vecindad9[7] ==1 || vecindad9[8] ==1)) ||
+                         (vecindad9[1]==1 && vecindad9[5] == 1 && (vecindad9[3] == 1 || vecindad9[6] ==1 || vecindad9[7] ==1)) ||
+                         (vecindad9[3]==1 && vecindad9[7] == 1 && (vecindad9[1] == 1 || vecindad9[2] ==1 || vecindad9[5] ==1)) ||
+                         (vecindad9[7]==1 && vecindad9[5] == 1 && (vecindad9[0] == 1 || vecindad9[1] ==1 || vecindad9[3] ==1)) ||
+                         //diagonales
+                         (vecindad9[6]==1 && vecindad9[8] == 1 && (vecindad9[0] == 1 || vecindad9[1] ==1 || vecindad9[2] ==1)) ||
+                         (vecindad9[8]==1 && vecindad9[2] == 1 && (vecindad9[0] == 1 || vecindad9[3] ==1 || vecindad9[6] ==1)) ||
+                         (vecindad9[2]==1 && vecindad9[0] == 1 && (vecindad9[6] == 1 || vecindad9[7] ==1 || vecindad9[8] ==1)) ||
+                         (vecindad9[0]==1 && vecindad9[6] == 1 && (vecindad9[2] == 1 || vecindad9[5] ==1 || vecindad9[8] ==1))
+
+                         ))
+                {
+                    intersectPointsEncontrados.push_back(Point(j+1, i+1) );
+
+                }
+
+//                //ESQUINAS
+//                if(valorAbsoluto == 3 &&
+//                        ((vecindad9[1]==1 && vecindad9[3] == 1) ||
+//                         (vecindad9[3]==1 && vecindad9[7] == 1) ||
+//                         (vecindad9[7]==1 && vecindad9[5] == 1) ||
+//                         (vecindad9[5]==1 && vecindad9[1] == 1)))
+
+
+//                {
+//                    cornerPointsEncontrados.push_back(Point(j+1,i+1));
+//                }
             }
-            else continue;
+            else  continue;
 
         }
     }
@@ -102,6 +147,7 @@ void ControlObtencionCaracteristicas::buscarEndPoints(Mat srcImage, vector<Point
 
     endPoints = endPointsEncontrados;
     intersectPoints = intersectPointsEncontrados;
+
 }
 
 

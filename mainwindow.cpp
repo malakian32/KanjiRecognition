@@ -87,7 +87,7 @@ void MainWindow::on_AperturaBT_clicked()
     Mat BStructElement = getStructuringElement(CV_SHAPE_RECT,Size(2,2));
 
     //erode(dstImageTreshold,dstImageOpening,Mat(),cv::Point(-1,-1),2);
-    morphologyEx(this->dstImageThresholdAdaptative, this->dstImageClose, CV_MOP_CLOSE, BStructElement,Point(-1,-1) ,1 );
+    morphologyEx(this->dstImageThresholdAdaptative, this->dstImageClose, CV_MOP_CLOSE, BStructElement,Point(-1,-1) ,2 );
 //    morphologyEx(this->dstImageClose, this->dstImageClose, CV_MOP_ERODE, BStructElementB,Point(-1,-1) ,1 );
 
 //    morphologyEx(this->dstImageClose, this->dstImageClose, CV_MOP_CLOSE, BStructElementB,Point(-1,-1) ,1 );
@@ -200,6 +200,10 @@ void MainWindow::on_AdelgazamientoBT_clicked()
     dstImageAdelgazada.copyTo(dstImageRectanguloEnvolvente);
     //Se suman 3 pixeles de distancia a las medidas del rectangulo para darle espacio
     //alalgoritmo de busqueda de end-points
+
+//    Rect rect = boundingRect(dstImageAdelgazada);
+
+//    if(rect.x == dstRectanguloEnvolvente.x) dstRectanguloEnvolvente = rect;
     dstRectanguloEnvolvente.height += 10;
     dstRectanguloEnvolvente.width += 10;
     dstRectanguloEnvolvente.x -= 5;
@@ -317,12 +321,13 @@ void MainWindow::on_EntrenarBT_clicked()
         //controlredneuronal::train( "/home/snipercat/Desktop/ArchivoCaracteristicasDataSet.csv", "/home/snipercat/Desktop/NeuralNetwork.xml"  );
         //return;
 
-    //FILE* archivoCaracteristicas = fopen("./Resources/ArchivoCaracteristicasDataSet.txt","w");
-    FILE* archivoCaracteristicas = fopen("/home/snipercat/Desktop/ArchivoCaracteristicasDataSet.csv","w");
+    FILE* archivoCaracteristicas = fopen("./ArchivoCaracteristicasDataSet.csv","w");
+    //FILE* archivoCaracteristicas = fopen("/home/snipercat/Desktop/ArchivoCaracteristicasDataSet.csv","w");
 
     for(unsigned i = 0; i<imagesDirectory.size();i++)
     {
-        cout<<imagesDirectory.at(i).first.data()<<endl;
+
+        cout<<"Archivo numero:"<<i<<" --- " <<imagesDirectory.at(i).first.data()<<endl;
         //ABRIR IMAGEN
         srcImage = imread(imagesDirectory.at(i).first.data(),0);
         line(srcImage,Point(0,0),Point(0,srcImage.rows),Scalar(255),20);
@@ -337,7 +342,7 @@ void MainWindow::on_EntrenarBT_clicked()
 
         //FILTRADO
         Mat BStructElement = getStructuringElement(CV_SHAPE_RECT,Size(2,2));
-        morphologyEx(this->dstImageThresholdAdaptative, this->dstImageClose, CV_MOP_CLOSE, BStructElement,Point(-1,-1) ,1 );
+        morphologyEx(this->dstImageThresholdAdaptative, this->dstImageClose, CV_MOP_CLOSE, BStructElement,Point(-1,-1) ,2 );
 
         //SEGMENTACION
         Mat src = imread(imagesDirectory.at(i).first);
@@ -350,7 +355,7 @@ void MainWindow::on_EntrenarBT_clicked()
         ControlPreprocesamiento::adelgazamiento(dstImageAdelgazada);
 
         dstImageAdelgazada.copyTo(dstImageRectanguloEnvolvente);
-        //Se suman 3 pixeles de distancia a las medidas del rectangulo para darle espacio
+        //Se suman 5 pixeles de distancia a las medidas del rectangulo para darle espacio
         //alalgoritmo de busqueda de end-points
         if(dstRectanguloEnvolvente.x <= 5 || dstRectanguloEnvolvente.y <= 5 ) continue;
         dstRectanguloEnvolvente.height += 10;
@@ -372,7 +377,7 @@ void MainWindow::on_EntrenarBT_clicked()
 
         vector<Point> endPoints;
         vector<Point> insersectPoints;
-        ControlObtencionCaracteristicas::buscarEndPoints(dstImageFinal,endPoints, insersectPoints);
+        ControlObtencionCaracteristicas::buscarPuntos(dstImageFinal,endPoints, insersectPoints);
         cout<<endPoints.size()<<endl;
 
         Mat dstImageMorph = ControlPreprocesamiento::morphImage(dstImageThreshold);
@@ -389,25 +394,105 @@ void MainWindow::on_EntrenarBT_clicked()
             <<momentosHu.at(0).at(5)<<","
             <<momentosHu.at(0).at(6)<2<","
             <<endl;*/
+        ///Determina a cual cuadrante pertenece cada punto
+           int cuadEndPoints0 = 0,cuadEndPoints1 = 0, cuadEndPoints2 = 0, cuadEndPoints3 = 0,
+                   cuadEndPoints4 = 0, cuadEndPoints5 = 0, cuadEndPoints6 = 0, cuadEndPoints7 = 0, cuadEndPoints8 = 0;
+           int mitadX1 = int(dstImageFinal.cols/3);
+           int mitadX2 = int(2*dstImageFinal.cols/3);
+           int mitadY1 = int(dstImageFinal.rows/3);
+           int mitadY2 = int(2*dstImageFinal.rows/3);
+           Point p;
 
-        //Determina a cual cuadrante pertenece cada punto
-        int cuadrante1 = 0;
-        int cuadrante2 = 0;
-        int cuadrante3 = 0;
-        int cuadrante4 = 0;
-        int mitadX = int(dstImageFinal.cols/2);
-        int mitadY = int(dstImageFinal.rows/2);
-        Point p;
+           for(unsigned c = 0; c< endPoints.size();c++){
+               p = endPoints.at(c);
+               //0
+               if( p.x < mitadX1 && p.y <  mitadY1 ){
+                   cuadEndPoints0++;
+                   continue;}
+               //1
+               if( p.x <  mitadX2 && p.y <  mitadY1 ){
+                   cuadEndPoints1++;
+                   continue;}
+               //2
+               if( p.x >=  mitadX2 && p.y < mitadY1 ){
+                   cuadEndPoints2++;
+                   continue;}
+               //3
+               if( p.x < mitadX1 && p.y < mitadY2 ){
+                   cuadEndPoints3++;
+                   continue;}
+               //4
+               if( p.x < mitadX2 && p.y < mitadY2 ){
+                   cuadEndPoints4++;
+                   continue;}
+               //5
+               if( p.x >= mitadX2 && p.y < mitadY2 ){
+                   cuadEndPoints5++;
+                   continue;}
+               //6
+               if( p.x < mitadX1 && p.y >= mitadY2 ){
+                   cuadEndPoints6++;
+                   continue;}
+               //7
+               if( p.x < mitadX2 && p.y >= mitadY2 ){
+                   cuadEndPoints7++;
+                   continue;}
+               //8
+               if( p.x >= mitadX2 && p.y >= mitadY2 ){
+                   cuadEndPoints8++;
+                   continue;}
 
-        for(unsigned c = 0; c< endPoints.size();c++){
-            p = endPoints.at(c);
-            if( p.x >= mitadX && p.y <  mitadY ){ cuadrante1++; }
-            if( p.x <  mitadX && p.y <  mitadY ){ cuadrante2++; }
-            if( p.x <  mitadX && p.y >= mitadY ){ cuadrante3++; }
-            if( p.x >= mitadX && p.y >= mitadY ){ cuadrante4++; }
-        }
 
-        fprintf(archivoCaracteristicas,"%f;%f;%f;%f;%f;%f;%f;%f;%d;%d;%d;%d;%d;%d;%d\n",
+           }
+
+           int cuadInterPoints0 = 0,cuadInterPoints1 = 0, cuadInterPoints2 = 0, cuadInterPoints3 = 0,
+                   cuadInterPoints4 = 0, cuadInterPoints5 = 0, cuadInterPoints6 = 0, cuadInterPoints7 = 0, cuadInterPoints8 = 0;
+
+
+           for(unsigned z = 0; z< insersectPoints.size();z++)
+           {
+               p = insersectPoints.at(z);
+
+               //0
+               if( p.x < mitadX1 && p.y <  mitadY1 ){
+                   cuadInterPoints0=1;
+                   continue;}
+               //1
+               if( p.x <  mitadX2 && p.y <  mitadY1 ){
+                   cuadInterPoints1=1;
+                   continue;}
+               //2
+               if( p.x >=  mitadX2 && p.y < mitadY1 ){
+                   cuadInterPoints2=1;
+                   continue;}
+               //3
+               if( p.x < mitadX1 && p.y < mitadY2 ){
+                   cuadInterPoints3=1;
+                   continue;}
+               //4
+               if( p.x < mitadX2 && p.y < mitadY2 ){
+                   cuadInterPoints4=1;;
+                   continue;}
+               //5
+               if( p.x >= mitadX2 && p.y < mitadY2 ){
+                   cuadInterPoints5=1;;
+                   continue;}
+               //6
+               if( p.x < mitadX1 && p.y >= mitadY2 ){
+                   cuadInterPoints6=1;;
+                   continue;}
+               //7
+               if( p.x < mitadX2 && p.y >= mitadY2 ){
+                   cuadInterPoints7=1;;
+                   continue;}
+               //8
+               if( p.x >= mitadX2 && p.y >= mitadY2 ){
+                   cuadInterPoints8=1;;
+                   continue;}
+           }
+
+
+        fprintf(archivoCaracteristicas,"%f;%f;%f;%f;%f;%f;%f;%f;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d\n",
               momentosHu.at(0).at(0),
               momentosHu.at(0).at(1),
               momentosHu.at(0).at(2),
@@ -416,12 +501,25 @@ void MainWindow::on_EntrenarBT_clicked()
               momentosHu.at(0).at(5),
               momentosHu.at(0).at(6),
               relacionAnchoAlto,
-              endPoints.size(),
-              //insersectPoints.size(),
-              cuadrante1,
-              cuadrante2,
-              cuadrante3,
-              cuadrante4,
+              endPoints.size(),//
+              cuadEndPoints0,
+              cuadEndPoints1,
+              cuadEndPoints2,
+              cuadEndPoints3,
+              cuadEndPoints4,
+              cuadEndPoints5,
+              cuadEndPoints6,
+              cuadEndPoints7,
+              cuadEndPoints8,
+//              cuadInterPoints0,
+//              cuadInterPoints1,
+//              cuadInterPoints2,
+//              cuadInterPoints3,
+//              cuadInterPoints4,
+//              cuadInterPoints5,
+//              cuadInterPoints6,
+//              cuadInterPoints7,
+//              cuadInterPoints8,
               contornos.size(),
               imagesDirectory.at(i).second);
 
@@ -430,7 +528,7 @@ void MainWindow::on_EntrenarBT_clicked()
     fclose(archivoCaracteristicas);
 
     //controlredneuronal::train( srcDataSetFile, srcNetworkFile  );
-    controlredneuronal::train( "/home/snipercat/Desktop/ArchivoCaracteristicasDataSet.csv", "/home/snipercat/Desktop/NeuralNetwork.xml"  );
+    controlredneuronal::train( "./ArchivoCaracteristicasDataSet.csv", "./NeuralNetwork.xml"  );
 
 
 }

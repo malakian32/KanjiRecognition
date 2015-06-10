@@ -24,7 +24,6 @@ void controlredneuronal::train( char *DataSet, char *dstNetworkFile ){
     cv::Mat test_set(TEST_SAMPLES, ATTRIBUTES, CV_32F);
     //matrix to hold the test labels.
     cv::Mat test_set_classifications(TEST_SAMPLES, CLASSES, CV_32F);
-
     //load the training data sets.
    read_trainingDataset(DataSet, training_set, training_set_classifications, TRAINING_SAMPLES);
 
@@ -65,41 +64,41 @@ void controlredneuronal::train( char *DataSet, char *dstNetworkFile ){
     training_set.release();
     training_set_classifications.release();
 
-    ///TEST THE NEURAL NETWORK
-    ///Carga la información del archivo de prueba y crea una red neuronal con la imformación
-    /// guardada anteriormente, Luego realiza una evaluación de los datos en el archivo de prueba
-    /// y registra cuantos número fueron reconocidos correctamente
-    //test_set, test_set_classifications,
-        read_trainingDataset("/home/snipercat/Desktop/ArchivoCaracteristicasTestSet.csv", test_set, test_set_classifications, TEST_SAMPLES);
-        FILE* test = fopen("/home/snipercat/Desktop/test.csv","w");
-        int expected;
-        int predicted;
-        int correct = 0;
-        cv::Mat test_sample;
-        cv::Mat test_sample_expected;
-        //controlredneuronal red = controlredneuronal(dstNetworkFile);
-        controlredneuronal red = controlredneuronal("/home/snipercat/Desktop/NeuralNetwork.xml");
+//    ///TEST THE NEURAL NETWORK
+//    ///Carga la información del archivo de prueba y crea una red neuronal con la imformación
+//    /// guardada anteriormente, Luego realiza una evaluación de los datos en el archivo de prueba
+//    /// y registra cuantos número fueron reconocidos correctamente
+//    //test_set, test_set_classifications,
+//        read_trainingDataset("./ArchivoCaracteristicasTestSet.csv", test_set, test_set_classifications, TEST_SAMPLES);
+//        FILE* test = fopen("./test.csv","w");
+//        int expected;
+//        int predicted;
+//        int correct = 0;
+//        cv::Mat test_sample;
+//        cv::Mat test_sample_expected;
+//        //controlredneuronal red = controlredneuronal(dstNetworkFile);
+//        controlredneuronal red = controlredneuronal("./NeuralNetwork.xml");
 
-        for( int c = 0; c <  TEST_SAMPLES ;c++ ){
-            //get Expected Value
-                test_sample_expected = test_set_classifications.row(c);
-                expected = controlredneuronal::returnValue(test_sample_expected);
-            //PREDICT
-               test_sample = test_set.row(c);
-               predicted = red.predict(test_sample);
-            //Write result to file
-               if(expected == predicted)
-                   correct++;
-               fprintf(test,"%d;%d;%d\n",
-                     c,
-                     expected,
-                     predicted
-                     );
-        }
-        cout<<"PREDICTION ACCURACY= "<<correct*100/TEST_SAMPLES<<"%";
-        test_set.release();
-        test_set_classifications.release();
-        fclose(test);
+//        for( int c = 0; c <  TEST_SAMPLES ;c++ ){
+//            //get Expected Value
+//                test_sample_expected = test_set_classifications.row(c);
+//                expected = controlredneuronal::returnValue(test_sample_expected);
+//            //PREDICT
+//               test_sample = test_set.row(c);
+//               predicted = red.predict(test_sample);
+//            //Write result to file
+//               if(expected == predicted)
+//                   correct++;
+//               fprintf(test,"%d;%d;%d\n",
+//                     c,
+//                     expected,
+//                     predicted
+//                     );
+//        }
+//        cout<<"PREDICTION ACCURACY= "<<correct*100/TEST_SAMPLES<<"%";
+//        test_set.release();
+//        test_set_classifications.release();
+//        fclose(test);
 
 
 
@@ -159,15 +158,15 @@ int  controlredneuronal::returnValue( cv::Mat outNetwork)
 /********************************************************************************
 This function will read the csv files(training and test dataset) and convert them
 into two matrices. classes matrix have 12 columns, one column for each class label. If the label of nth row in data matrix
-is, lets say 5 then the value of classes[n][5] = 1.
+    is, lets say 5 then the value of classes[n][5] = 1.
 first
 ********************************************************************************/
 
 void controlredneuronal::read_trainingDataset(char *filename, cv::Mat &data, cv::Mat &classes, int total_samples)
 {
 
-    int label;
-    float moment;
+    int label = 0;
+    float moment = 0.0;
     //open the file
     FILE* inputfile = fopen(filename, "r");
 
@@ -177,18 +176,20 @@ void controlredneuronal::read_trainingDataset(char *filename, cv::Mat &data, cv:
         //for each attribute in the row
         for (int col = 0; col <= ATTRIBUTES; col++)
         {
-            //if its the pixel value.
+
             if (col < ATTRIBUTES) {
 
                 fscanf(inputfile, "%f;", &moment);
+                cout<<moment<<",";
                 data.at<float>(row, col) = moment;
 
-            }//if its the label
+            }
             else if (col == ATTRIBUTES) {
-                //make the value of label column in that row as 1.
                 fscanf(inputfile, "%d", &label);
+                cout<<"clase "<<label<<endl;
                 classes.at<float>(row, label-1) = 1.0;
             }
+
         }
 
        /* for( int c=0; c< ATTRIBUTES ;  c++){
