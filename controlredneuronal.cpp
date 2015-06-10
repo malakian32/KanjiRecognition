@@ -15,7 +15,7 @@ controlredneuronal::controlredneuronal(char *srcNetworkFile)
  * @brief train: Will TRain the Neural Network with the information in the filename path
  * and will save the configuration of the resultant Neural Network in the file fileStorage_Path/
  */
-void controlredneuronal::train( char *DataSet, char *dstNetworkFile ){
+int controlredneuronal::train(char *DataSet, char *TestDataSet, char *dstNetworkFile){
     //matrix to hold the training sample
     cv::Mat training_set(TRAINING_SAMPLES, ATTRIBUTES, CV_32F);
     //matrix to hold the labels of each taining sample
@@ -69,40 +69,35 @@ void controlredneuronal::train( char *DataSet, char *dstNetworkFile ){
 //    /// guardada anteriormente, Luego realiza una evaluación de los datos en el archivo de prueba
 //    /// y registra cuantos número fueron reconocidos correctamente
 //    //test_set, test_set_classifications,
-//        read_trainingDataset("./ArchivoCaracteristicasTestSet.csv", test_set, test_set_classifications, TEST_SAMPLES);
-//        FILE* test = fopen("./test.csv","w");
-//        int expected;
-//        int predicted;
-//        int correct = 0;
-//        cv::Mat test_sample;
-//        cv::Mat test_sample_expected;
-//        //controlredneuronal red = controlredneuronal(dstNetworkFile);
-//        controlredneuronal red = controlredneuronal("./NeuralNetwork.xml");
+        read_trainingDataset(TestDataSet, test_set, test_set_classifications, TEST_SAMPLES);
+        FILE* test = fopen("./test.csv","w");
+        int expected;
+        int predicted;
+        int correct = 0;
+        cv::Mat test_sample;
+        cv::Mat test_sample_expected;
 
-//        for( int c = 0; c <  TEST_SAMPLES ;c++ ){
-//            //get Expected Value
-//                test_sample_expected = test_set_classifications.row(c);
-//                expected = controlredneuronal::returnValue(test_sample_expected);
-//            //PREDICT
-//               test_sample = test_set.row(c);
-//               predicted = red.predict(test_sample);
-//            //Write result to file
-//               if(expected == predicted)
-//                   correct++;
-//               fprintf(test,"%d;%d;%d\n",
-//                     c,
-//                     expected,
-//                     predicted
-//                     );
-//        }
-//        cout<<"PREDICTION ACCURACY= "<<correct*100/TEST_SAMPLES<<"%";
-//        test_set.release();
-//        test_set_classifications.release();
-//        fclose(test);
+        controlredneuronal red = controlredneuronal(dstNetworkFile);
 
+        for( int c = 0; c <  TEST_SAMPLES ;c++ ){
+            //get Expected Value
+                test_sample_expected = test_set_classifications.row(c);
+                expected = controlredneuronal::returnValue(test_sample_expected);
+            //PREDICT
+               test_sample = test_set.row(c);
+               predicted = red.predict(test_sample);
+            //Write result to file
+               if(expected == predicted)
+                   correct++;
+               fprintf(test,"%d;%d;%d\n", c,expected, predicted );
+        }
+        cout<<"PREDICTION ACCURACY= "<<correct*100/TEST_SAMPLES<<"%";
+        test_set.release();
+        test_set_classifications.release();
+        fclose(test);
 
-
-
+        return( correct*100/TEST_SAMPLES);
+        //return 0;
 }
 
 
@@ -180,13 +175,13 @@ void controlredneuronal::read_trainingDataset(char *filename, cv::Mat &data, cv:
             if (col < ATTRIBUTES) {
 
                 fscanf(inputfile, "%f;", &moment);
-                cout<<moment<<",";
+                //cout<<moment<<",";
                 data.at<float>(row, col) = moment;
 
             }
             else if (col == ATTRIBUTES) {
                 fscanf(inputfile, "%d", &label);
-                cout<<"clase "<<label<<endl;
+                //cout<<"clase "<<label<<endl;
                 classes.at<float>(row, label-1) = 1.0;
             }
 

@@ -450,12 +450,12 @@
        <rect>
         <x>30</x>
         <y>40</y>
-        <width>121</width>
+        <width>191</width>
         <height>31</height>
        </rect>
       </property>
       <property name="text">
-       <string>Abrir Fichero</string>
+       <string>Directorio Entrenamiento</string>
       </property>
      </widget>
      <widget class="QLineEdit" name="URLFicherLB">
@@ -464,7 +464,7 @@
       </property>
       <property name="geometry">
        <rect>
-        <x>180</x>
+        <x>240</x>
         <y>40</y>
         <width>381</width>
         <height>27</height>
@@ -475,7 +475,7 @@
       <property name="geometry">
        <rect>
         <x>40</x>
-        <y>110</y>
+        <y>80</y>
         <width>121</width>
         <height>17</height>
        </rect>
@@ -488,7 +488,7 @@
       <property name="geometry">
        <rect>
         <x>40</x>
-        <y>150</y>
+        <y>100</y>
         <width>151</width>
         <height>17</height>
        </rect>
@@ -501,7 +501,7 @@
       <property name="geometry">
        <rect>
         <x>230</x>
-        <y>150</y>
+        <y>100</y>
         <width>67</width>
         <height>17</height>
        </rect>
@@ -514,7 +514,7 @@
       <property name="geometry">
        <rect>
         <x>230</x>
-        <y>110</y>
+        <y>80</y>
         <width>67</width>
         <height>17</height>
        </rect>
@@ -529,14 +529,134 @@
       </property>
       <property name="geometry">
        <rect>
-        <x>240</x>
-        <y>210</y>
+        <x>30</x>
+        <y>220</y>
         <width>221</width>
         <height>61</height>
        </rect>
       </property>
       <property name="text">
        <string>Generar Data Set </string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="NombreFicheroPruebaLB">
+      <property name="geometry">
+       <rect>
+        <x>230</x>
+        <y>170</y>
+        <width>67</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_3">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>190</y>
+        <width>151</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Numero de Archivos</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="URLFicherPruebaLB">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>130</y>
+        <width>381</width>
+        <height>27</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="testPathBT">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>130</y>
+        <width>191</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Directorio Pruebas</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="SizeFicheroPruebaLB">
+      <property name="geometry">
+       <rect>
+        <x>230</x>
+        <y>190</y>
+        <width>67</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_4">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>170</y>
+        <width>121</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Nombre Fichero</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="EntrenarBT_2">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>300</y>
+        <width>221</width>
+        <height>61</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Entrenar</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="eficaciaLB">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>390</y>
+        <width>121</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>% de Eficacia:</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="eficacia_ValueLB">
+      <property name="geometry">
+       <rect>
+        <x>150</x>
+        <y>390</y>
+        <width>141</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>% de Eficacia:</string>
       </property>
      </widget>
     </widget>

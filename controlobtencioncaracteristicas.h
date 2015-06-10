@@ -20,6 +20,9 @@ public:
     static vector<vector<Point> > getContornos( Mat src_gray);
     static vector<vector<double> > getHuMoments( vector<vector<Point> >  contours);
     static Mat  getContornosImage(Mat src_gray, vector<vector<Point> > contours);
+
+    static vector<Point >  getEnvolvingPolygon( vector<vector< Point > >  contours);
+    static Mat getEnvolvingPolygonImage(Mat src_gray, vector<Point > points);
 };
 
 #endif // CONTROLOBTENCIONCARACTERISTICAS_H

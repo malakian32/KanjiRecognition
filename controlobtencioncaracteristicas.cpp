@@ -178,3 +178,47 @@ vector<vector<Point> > ControlObtencionCaracteristicas::getContornos( Mat src_gr
    */
    return contours;
 }
+
+
+/**
+ * @brief ControlObtencionCaracteristicas::getEnvolvingPolygon Returns a convez polygon evolving all the points
+ * @param contours
+ * @return
+ */
+vector<Point > ControlObtencionCaracteristicas::getEnvolvingPolygon( vector<vector< Point > >  contours){
+
+
+  //Colocar los puntos del contorno en un solo vector
+    vector<Point> contoursPoints;
+    for(unsigned int k = 0; k < contours.size();k++){
+        for(unsigned int l = 0; l < contours[k].size();l++)
+        {
+            contoursPoints.push_back(contours[k][l]);
+        }
+    }
+
+    vector<Point> approxCurve;
+    convexHull( contoursPoints,  approxCurve);
+
+    return approxCurve;
+
+    ///////////////////////////////////////
+}
+
+/**
+ * @brief ControlObtencionCaracteristicas::getEnvolvingPolygonImage: returns a Black image with the white plygon
+ * formed by the points
+ * @param src_gray
+ * @param points
+ * @return
+ */
+Mat ControlObtencionCaracteristicas::getEnvolvingPolygonImage(Mat src_gray, vector<Point > points){
+    Mat drawing = Mat::zeros( src_gray.size(), CV_8UC3 );
+
+    fillConvexPoly(drawing,points,255);
+
+    return drawing;
+
+}
+
+

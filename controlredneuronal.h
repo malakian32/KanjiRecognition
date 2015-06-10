@@ -15,12 +15,12 @@ using namespace std;
 
 
 #define TRAINING_SAMPLES 1196    //Number of samples in training dataset
-#define ATTRIBUTES 19  		  //Number of hu moments
+#define ATTRIBUTES 20  		  //Number of hu moments
 #define TEST_SAMPLES 732       //Number of samples in test dataset
 #define CLASSES 12             //Number of distinct labels. 1 or 0
 #define HIDDEN_NEURONES 30       //NUMBER OF HIDDEN NEURONES
 
-//#define srcTestDataSetFile "/home/snipercat/Desktop/ArchivoCaracteristicasTestSet.csv"
+
 class controlredneuronal
 {
 public:
@@ -28,7 +28,7 @@ public:
     controlredneuronal(char *srcNetworkFile);
     //FUNCIONES PARA RED NEURONAL
     int predict( cv::Mat data );
-    static void train(char *DataSet, char *dstNetworkFile);
+    static int train(char *DataSet, char *TestDataSet, char *dstNetworkFile);
 
 
 
@@ -39,8 +39,6 @@ private:
 
     static void read_trainingDataset( char *filename, cv::Mat &data, cv::Mat &classes, int total_samples );
     static int  returnValue( cv::Mat outNetwork);
-
-    //static string srcTestDataSetFile = "/home/snipercat/Desktop/ArchivoCaracteristicasTestSet.csv";
 
 };
 

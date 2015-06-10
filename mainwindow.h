@@ -54,6 +54,12 @@ private slots:
 
     void on_EntrenarBT_clicked();
 
+    void generarDataSet(char* fileName,vector<pair<string,int> > imagesList);
+
+    void on_testPathBT_clicked();
+
+    void on_EntrenarBT_2_clicked();
+
 private:
     Mat srcImage;
     Mat srcImageEqualizada;
@@ -72,6 +78,7 @@ private:
     QString ficheroAbierto;
     //QStringList imagesDirectory;
     vector<pair<string,int> > imagesDirectory;
+    vector<pair<string,int> > testImagesDirectory;
     bool ImagenAbierta;
     Ui::MainWindow *ui;
 

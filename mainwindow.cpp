@@ -63,7 +63,7 @@ void MainWindow::buscarArchivo()
     line(srcImage,Point(0,0),Point(0,srcImage.rows),Scalar(255),20);
     line(srcImage,Point(0,0),Point(srcImage.cols,0),Scalar(255),20);
     line(srcImage,Point(srcImage.cols,srcImage.rows),Point(srcImage.cols,0),Scalar(255),20);
-    line(srcImage,Point(srcImage.cols,srcImage.rows),Point(0,srcImage.cols),Scalar(255),20);
+    line(srcImage,Point(srcImage.cols,srcImage.rows),Point(0,srcImage.rows),Scalar(255),20);
 
     equalizeHist(this->srcImage,  this->srcImageEqualizada );
     this->ImagenAbierta = true;
@@ -86,11 +86,8 @@ void MainWindow::on_AperturaBT_clicked()
 {
     Mat BStructElement = getStructuringElement(CV_SHAPE_RECT,Size(2,2));
 
-    //erode(dstImageTreshold,dstImageOpening,Mat(),cv::Point(-1,-1),2);
     morphologyEx(this->dstImageThresholdAdaptative, this->dstImageClose, CV_MOP_CLOSE, BStructElement,Point(-1,-1) ,2 );
-//    morphologyEx(this->dstImageClose, this->dstImageClose, CV_MOP_ERODE, BStructElementB,Point(-1,-1) ,1 );
 
-//    morphologyEx(this->dstImageClose, this->dstImageClose, CV_MOP_CLOSE, BStructElementB,Point(-1,-1) ,1 );
 
     QImage filtradoImage = Mat2QImage(dstImageClose);
     ui->FiltradoMorfologicoLB->setPixmap(QPixmap::fromImage(filtradoImage));
@@ -115,78 +112,7 @@ void MainWindow::on_cierreBT_clicked()
 
 void MainWindow::on_GO_clicked()
 {
-/*
 
-    //Path de la imágen
-    String path = "/home/snipercat/Desktop/ETL8/images/GO/000.png";
-
-    this->srcImage = imread( path , CV_LOAD_IMAGE_GRAYSCALE );// cargamos la imagen en Blanco y negros
-
-    /*Cambiar el Tamaño de la imagen en caso de que sea muy grande
-     * int maxheight = ui->maxHeight->value();
-    if(maxheight !=0 && imagenBW->height > maxheight){
-        IplImage *resizedImage = cvCreateImage( cvSize( maxheight * (imagenBW->width/(imagenBW->height)) , maxheight) , imagenBW->depth , imagenBW->nChannels);
-        cvResize(imagenBW, resizedImage, CV_INTER_LINEAR);
-        imagenBW = resizedImage;
-    }
-
-
-    //Colocar la imágen original en el recuadro
-    QImage originalImage = Mat2QImage(this->srcImage);
-    ui->ImagenOriginalLB->setPixmap(QPixmap::fromImage(originalImage));
-
-
-    //Equalize
-        Mat equalizedImage;
-        cv::equalizeHist(this->srcImage, equalizedImage);
-
-        //imshow( "Equalize", equalizedImage ); // representamos la imagen en la ventana
-
-    //Threshold
-        this->dstImageTreshold = ControlPreprocesamiento::umbralAutomatico(equalizedImage);
-            //Colocar la imágen en el recuadro
-            QImage thresholdlImage = Mat2QImage(this->dstImageTreshold);
-            ui->UmbralizacionLB->setPixmap(QPixmap::fromImage(thresholdlImage));
-
-            //imshow( "Binarizada", dstImageTreshold ); // representamos la imagen en la ventana
-
-    //Morphologia
-        this->dstImageClose =  ControlPreprocesamiento::morphImage(this->dstImageTreshold);
-            //Colocar la imágen en el recuadro
-            QImage morphedImage = Mat2QImage(this->dstImageClose);
-            ui->FiltradoMorfologicoLB->setPixmap(QPixmap::fromImage(morphedImage));
-            //imshow( "Morphed", this->dstImageClose ); // representamos la imagen en la ventana
-
-    //Bordes
-        vector<vector<Point> > contours = ControlPreprocesamiento::getContornos( this->dstImageClose);
-        this->dstImageContornos= ControlPreprocesamiento::getContornosImage(this->dstImageClose,contours);
-            //Colocar la imágen en el recuadro
-                QImage contoursImage = Mat2QImage( this->dstImageContornos);
-                ui->ContornosLB->setPixmap(QPixmap::fromImage(contoursImage));
-    //cout<<"Contornos "<<contours.size()<<"\n";
-
-    //MOMENTOS DE HU
-        vector<vector<double> > HuMoments = ControlPreprocesamiento::getHuMoments(contours);
-
-
-/////////////////////////
-   ///SEGMENTACION
-        Mat src = imread(path);
-            ControlSegmentacion::encontrarSegmentos(src,dstImageClose,dstImageSegmentacion,dstRectanguloEnvolvente);
-
-            QImage segmentacionImage = Mat2QImage(this->dstImageSegmentacion);
-            ui->SegmentacionLB->setPixmap(QPixmap::fromImage(segmentacionImage));
-            ui->CaracteristicasBT->setEnabled(true);
-    ///ADELGAZAMIENTO
-            dstImageAdelgazada = Mat::zeros(dstImageClose.size(), CV_8UC1);
-            dstImageClose.copyTo(dstImageAdelgazada);
-            ControlPreprocesamiento::adelgazamiento(dstImageAdelgazada);
-            //Colocar la imágen en el recuadro
-                QImage adelgazamientoImage = Mat2QImage(dstImageAdelgazada);
-                ui->AdelgazamientoLB->setPixmap(QPixmap::fromImage(adelgazamientoImage));
-
-//////////////////////
-*/
 }
 
 
@@ -203,7 +129,7 @@ void MainWindow::on_AdelgazamientoBT_clicked()
 
 //    Rect rect = boundingRect(dstImageAdelgazada);
 
-//    if(rect.x == dstRectanguloEnvolvente.x) dstRectanguloEnvolvente = rect;
+//    if(dstRectanguloEnvolvente.x <= 5 || dstRectanguloEnvolvente.y <= 5 ) continue;
     dstRectanguloEnvolvente.height += 10;
     dstRectanguloEnvolvente.width += 10;
     dstRectanguloEnvolvente.x -= 5;
@@ -232,19 +158,7 @@ void MainWindow::on_SegmentacionBT_clicked()
     ui->SegmentacionLB->setPixmap(QPixmap::fromImage(segmentacionImage));
     ui->AdelgazamientoBT->setEnabled(true);
 }
-/*
-void MainWindow::on_CaracteristicasBT_clicked()
-{
 
-    //Bordes
-        vector<vector<Point> > contours;
-        contours = ControlPreprocesamiento::getContornos(this->dstImageClose);
-    //MOMENTOS DE HU
-        vector<vector<double> > HuMoments = ControlPreprocesamiento::getHuMoments(contours);
-        cout<<"HU MOMENTS END;";
-
-}
-*/
 
 QImage MainWindow::Mat2QImage(const Mat& srcImage)
 {
@@ -314,22 +228,56 @@ void MainWindow::on_abrirFicheroBT_clicked()
 
 }
 
+//Botón para abrir path de pruebas
+void MainWindow::on_testPathBT_clicked()
+{
+    this->ficheroAbierto = QFileDialog::getExistingDirectory(this,tr("Abrir Directorio"),"./resources",QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+
+    ControlFicheros::abrirFichero(path(ficheroAbierto.toStdString()),testImagesDirectory);
+    string nombreFichero = path(ficheroAbierto.toStdString()).filename().c_str();
+    ostringstream numeroArchivos;
+    numeroArchivos<<testImagesDirectory.size();
+
+    ui->URLFicherPruebaLB->setText(ficheroAbierto);
+    ui->NombreFicheroPruebaLB->setText(QString::fromStdString(nombreFichero));
+    ui->SizeFicheroPruebaLB->setText(QString::fromStdString(numeroArchivos.str()));
+    ui->EntrenarBT->setEnabled(true
+                               );
+}
+
 void MainWindow::on_EntrenarBT_clicked()
 {
-    //QUITAR COMENTARIO PARA HACER PRUEBAS CON DISTINTAS CONFIGURACIONES DE RED NEURONAL TENIENDO
-    //EL ARCHIVO DE CARACTERÍSTICAS
-        //controlredneuronal::train( "/home/snipercat/Desktop/ArchivoCaracteristicasDataSet.csv", "/home/snipercat/Desktop/NeuralNetwork.xml"  );
-        //return;
 
-    FILE* archivoCaracteristicas = fopen("./ArchivoCaracteristicasDataSet.csv","w");
-    //FILE* archivoCaracteristicas = fopen("/home/snipercat/Desktop/ArchivoCaracteristicasDataSet.csv","w");
+    ui->EntrenarBT_2->setEnabled(false);
+    //generar DataSet de Entrenamiento
+    generarDataSet("./ArchivoCaracteristicasDataSet.csv",imagesDirectory);
 
-    for(unsigned i = 0; i<imagesDirectory.size();i++)
+    //generar DataSet de Prueba
+    generarDataSet("./ArchivoCaracteristicasTestSet.csv",testImagesDirectory);
+
+    ui->EntrenarBT_2->setEnabled(true);
+}
+
+
+void MainWindow::on_EntrenarBT_2_clicked()
+{
+    ui->EntrenarBT_2->setEnabled(false);
+    int efficiency = controlredneuronal::train( "./ArchivoCaracteristicasDataSet.csv", "./ArchivoCaracteristicasTestSet.csv",  "./NeuralNetwork.xml"  );
+    ui->eficacia_ValueLB->setText( QString("%1 %").arg(efficiency));
+    ui->EntrenarBT_2->setEnabled(true);
+}
+
+
+void MainWindow::generarDataSet(char* fileName,vector<pair<string,int> > imagesList){
+
+    FILE* archivoCaracteristicas = fopen(fileName,"w");
+
+    for(unsigned i = 0; i<imagesList.size();i++)
     {
 
-        cout<<"Archivo numero:"<<i<<" --- " <<imagesDirectory.at(i).first.data()<<endl;
+        cout<<"Archivo numero:"<<i<<" --- " <<imagesList.at(i).first.data()<<endl;
         //ABRIR IMAGEN
-        srcImage = imread(imagesDirectory.at(i).first.data(),0);
+        srcImage = imread(imagesList.at(i).first.data(),0);
         line(srcImage,Point(0,0),Point(0,srcImage.rows),Scalar(255),20);
         line(srcImage,Point(0,0),Point(srcImage.cols,0),Scalar(255),20);
         line(srcImage,Point(srcImage.cols,srcImage.rows),Point(srcImage.cols,0),Scalar(255),20);
@@ -345,7 +293,7 @@ void MainWindow::on_EntrenarBT_clicked()
         morphologyEx(this->dstImageThresholdAdaptative, this->dstImageClose, CV_MOP_CLOSE, BStructElement,Point(-1,-1) ,2 );
 
         //SEGMENTACION
-        Mat src = imread(imagesDirectory.at(i).first);
+        Mat src = imread(imagesList.at(i).first);
         ControlSegmentacion::encontrarSegmentos(src,dstImageClose,dstImageSegmentacion,dstRectanguloEnvolvente);
 
         //ADELGAZAMIENTOsrcImage
@@ -386,6 +334,12 @@ void MainWindow::on_EntrenarBT_clicked()
         contornos = ControlObtencionCaracteristicas::getContornos(dstImageMorph);
         vector<vector<double> > momentosHu = ControlObtencionCaracteristicas::getHuMoments(contornos);
 
+    // POLIGONO ENVOLVENTE
+       vector<Point > poligono = ControlObtencionCaracteristicas::getEnvolvingPolygon( contornos);
+       Mat poligonoimagen = ControlObtencionCaracteristicas::getEnvolvingPolygonImage(srcImage, poligono);
+       vector<vector<Point > > contornoPoligono = ControlObtencionCaracteristicas::getContornos(poligonoimagen);
+           momentosHu = ControlObtencionCaracteristicas::getHuMoments(contornoPoligono);
+
      /*   cout<<momentosHu.at(0).at(0)<<","
             <<momentosHu.at(0).at(1)<<","
             <<momentosHu.at(0).at(2)<<","
@@ -403,46 +357,27 @@ void MainWindow::on_EntrenarBT_clicked()
            int mitadY2 = int(2*dstImageFinal.rows/3);
            Point p;
 
+           //Calcular cuantos endPoints hay en cada cuadrante
            for(unsigned c = 0; c< endPoints.size();c++){
                p = endPoints.at(c);
                //0
-               if( p.x < mitadX1 && p.y <  mitadY1 ){
-                   cuadEndPoints0++;
-                   continue;}
+               if( p.x <  mitadX1 && p.y <  mitadY1 ){ cuadEndPoints0++; continue;}
                //1
-               if( p.x <  mitadX2 && p.y <  mitadY1 ){
-                   cuadEndPoints1++;
-                   continue;}
+               if( p.x <  mitadX2 && p.y <  mitadY1 ){ cuadEndPoints1++; continue;}
                //2
-               if( p.x >=  mitadX2 && p.y < mitadY1 ){
-                   cuadEndPoints2++;
-                   continue;}
+               if( p.x >= mitadX2 && p.y <  mitadY1 ){ cuadEndPoints2++; continue;}
                //3
-               if( p.x < mitadX1 && p.y < mitadY2 ){
-                   cuadEndPoints3++;
-                   continue;}
+               if( p.x <  mitadX1 && p.y <  mitadY2 ){ cuadEndPoints3++; continue;}
                //4
-               if( p.x < mitadX2 && p.y < mitadY2 ){
-                   cuadEndPoints4++;
-                   continue;}
+               if( p.x <  mitadX2 && p.y <  mitadY2 ){ cuadEndPoints4++; continue;}
                //5
-               if( p.x >= mitadX2 && p.y < mitadY2 ){
-                   cuadEndPoints5++;
-                   continue;}
+               if( p.x >= mitadX2 && p.y <  mitadY2 ){ cuadEndPoints5++; continue;}
                //6
-               if( p.x < mitadX1 && p.y >= mitadY2 ){
-                   cuadEndPoints6++;
-                   continue;}
+               if( p.x <  mitadX1 && p.y >= mitadY2 ){ cuadEndPoints6++; continue;}
                //7
-               if( p.x < mitadX2 && p.y >= mitadY2 ){
-                   cuadEndPoints7++;
-                   continue;}
+               if( p.x <  mitadX2 && p.y >= mitadY2 ){ cuadEndPoints7++; continue;}
                //8
-               if( p.x >= mitadX2 && p.y >= mitadY2 ){
-                   cuadEndPoints8++;
-                   continue;}
-
-
+               if( p.x >= mitadX2 && p.y >= mitadY2 ){ cuadEndPoints8++; continue;}
            }
 
            int cuadInterPoints0 = 0,cuadInterPoints1 = 0, cuadInterPoints2 = 0, cuadInterPoints3 = 0,
@@ -452,47 +387,28 @@ void MainWindow::on_EntrenarBT_clicked()
            for(unsigned z = 0; z< insersectPoints.size();z++)
            {
                p = insersectPoints.at(z);
-
                //0
-               if( p.x < mitadX1 && p.y <  mitadY1 ){
-                   cuadInterPoints0=1;
-                   continue;}
+               if( p.x <  mitadX1 && p.y <  mitadY1 ){ cuadInterPoints0=1; continue;}
                //1
-               if( p.x <  mitadX2 && p.y <  mitadY1 ){
-                   cuadInterPoints1=1;
-                   continue;}
+               if( p.x <  mitadX2 && p.y <  mitadY1 ){ cuadInterPoints1=1; continue;}
                //2
-               if( p.x >=  mitadX2 && p.y < mitadY1 ){
-                   cuadInterPoints2=1;
-                   continue;}
+               if( p.x >= mitadX2 && p.y <  mitadY1 ){ cuadInterPoints2=1; continue;}
                //3
-               if( p.x < mitadX1 && p.y < mitadY2 ){
-                   cuadInterPoints3=1;
-                   continue;}
+               if( p.x <  mitadX1 && p.y <  mitadY2 ){ cuadInterPoints3=1; continue;}
                //4
-               if( p.x < mitadX2 && p.y < mitadY2 ){
-                   cuadInterPoints4=1;;
-                   continue;}
+               if( p.x <  mitadX2 && p.y <  mitadY2 ){ cuadInterPoints4=1; continue;}
                //5
-               if( p.x >= mitadX2 && p.y < mitadY2 ){
-                   cuadInterPoints5=1;;
-                   continue;}
+               if( p.x >= mitadX2 && p.y <  mitadY2 ){ cuadInterPoints5=1; continue;}
                //6
-               if( p.x < mitadX1 && p.y >= mitadY2 ){
-                   cuadInterPoints6=1;;
-                   continue;}
+               if( p.x <  mitadX1 && p.y >= mitadY2 ){ cuadInterPoints6=1; continue;}
                //7
-               if( p.x < mitadX2 && p.y >= mitadY2 ){
-                   cuadInterPoints7=1;;
-                   continue;}
+               if( p.x <  mitadX2 && p.y >= mitadY2 ){ cuadInterPoints7=1; continue;}
                //8
-               if( p.x >= mitadX2 && p.y >= mitadY2 ){
-                   cuadInterPoints8=1;;
-                   continue;}
+               if( p.x >= mitadX2 && p.y >= mitadY2 ){ cuadInterPoints8=1; continue;}
            }
 
 
-        fprintf(archivoCaracteristicas,"%f;%f;%f;%f;%f;%f;%f;%f;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d\n",
+        fprintf(archivoCaracteristicas,"%f;%f;%f;%f;%f;%f;%f;%f;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d\n",
               momentosHu.at(0).at(0),
               momentosHu.at(0).at(1),
               momentosHu.at(0).at(2),
@@ -521,14 +437,10 @@ void MainWindow::on_EntrenarBT_clicked()
 //              cuadInterPoints7,
 //              cuadInterPoints8,
               contornos.size(),
-              imagesDirectory.at(i).second);
+              poligono.size(),
+              imagesList.at(i).second);
 
     }
 
     fclose(archivoCaracteristicas);
-
-    //controlredneuronal::train( srcDataSetFile, srcNetworkFile  );
-    controlredneuronal::train( "./ArchivoCaracteristicasDataSet.csv", "./NeuralNetwork.xml"  );
-
-
 }
